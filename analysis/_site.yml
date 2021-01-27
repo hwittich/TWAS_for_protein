@@ -1,7 +1,7 @@
-name: "TWAS_for_Protein"
+name: TWAS_for_Protein
 output_dir: ../docs
 navbar:
-  title: "TWAS_for_Protein"
+  title: TWAS_for_Protein
   left:
   - text: Home
     href: index.html
@@ -9,6 +9,10 @@ navbar:
     href: about.html
   - text: License
     href: license.html
+  right:
+  - icon: fa-github
+    text: Source code
+    href: https://github.com/hwittich/TWAS_for_protein
 output:
   workflowr::wflow_html:
     toc: yes

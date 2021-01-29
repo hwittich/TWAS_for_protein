@@ -6,5 +6,8 @@ output:
 editor_options:
   chunk_output_type: console
 ---
+Can we predict protein levels using imputed RNA expression models?
 
-Describe your project.
+While protein levels are largely affected by environmental factors, there is a genetic component that can be difficult to elucidate. We want to detangle genetic protein levels from environmental influence by performing a Transcriptome-wide association study (TWAS). Using the PrediXcan software, we will perform an analysis to attempt to correlate imputed RNA expression data from the TOPMed cohort, along with expression data from the GTEx database to measured protein levels (using this as our phenotype).
+
+In this research website, I will detail my process performing a test-run of this analysis using genotype dosage data and protein levels from the TOPMed cohort.

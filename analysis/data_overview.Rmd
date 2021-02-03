@@ -18,5 +18,12 @@ head
 ```
 Each row in the dosage file corresponds with a SNP. The "chromosome" field lists the chromosome code, and the "position" field contains the base-pair position of each SNP. The "variant_id" field stores the SNP code, which is a concatenation of the chromosome code and base-pair location. The "A1" and "A2" fields list the allele 1 and allele 2 codes, respectively, and the "MAF" field contains the frequency of allele 2. Finally, at the end of the file are n columns of dosage values, where n is the number of individuals in the dataset.
 
+# DB File
+SQLite database, built from elastic net (en) models. GTEx_v8_en   
+"Prediction models are SQLite databases with two tables, weights and extra. The weights table has columns gene rsid varID ref_allele eff_allele weight, where each variant has an ID with the format chr_pos_ref_eff_build. For example, the snp rs115095900 has variant ID chr10_101056744_G_C_b37. GTEx v8 model variants have the string chr in front,"
+
+#Samples.txt
+two columns, they are the same: FID, family ID, and IID, individual ID
+
 # Protein Expression File
 Each row corresponds to a protein (we are only working with one at the moment) and each column corresponds to an individual. 

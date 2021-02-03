@@ -11,9 +11,9 @@
 
 <meta name="author" content="hwittich" />
 
-<meta name="date" content="2021-01-28" />
+<meta name="date" content="2021-02-02" />
 
-<title>data_overview</title>
+<title>running_PrediXcan</title>
 
 <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -399,9 +399,9 @@ div.tocify {
 
 
 
-<h1 class="title toc-ignore">data_overview</h1>
+<h1 class="title toc-ignore">running_PrediXcan</h1>
 <h4 class="author">hwittich</h4>
-<h4 class="date">2021-01-28</h4>
+<h4 class="date">2021-02-02</h4>
 
 </div>
 
@@ -550,7 +550,7 @@ Note that any generated files, e.g. HTML, png, CSS, etc., are not included in t
 <div id="versions" class="tab-pane fade">
 
 <p>
-These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/data_overview.Rmd</code>) and HTML (<code>docs/data_overview.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
+These are the previous versions of the repository in which changes were made to the R Markdown (<code>analysis/running_PrediXcan.Rmd</code>) and HTML (<code>docs/running_PrediXcan.html</code>) files. If you’ve configured a remote Git repository (see <code>?wflow_git_remote</code>), click on the hyperlinks in the table below to view the files as they were in that past version.
 </p>
 <div class="table-responsive">
 <table class="table table-condensed table-hover">
@@ -579,7 +579,7 @@ Message
 Rmd
 </td>
 <td>
-<a href="https://github.com/hwittich/TWAS_for_protein/blob/e37507f9d5c97621086726d90fe065cad721f07b/analysis/data_overview.Rmd" target="_blank">e37507f</a>
+<a href="https://github.com/hwittich/TWAS_for_protein/blob/e37507f9d5c97621086726d90fe065cad721f07b/analysis/running_PrediXcan.Rmd" target="_blank">e37507f</a>
 </td>
 <td>
 hwittich
@@ -591,40 +591,6 @@ hwittich
 First run of PrediXcan
 </td>
 </tr>
-<tr>
-<td>
-html
-</td>
-<td>
-<a href="https://rawcdn.githack.com/hwittich/TWAS_for_protein/19be39019e4bf60dd97e3db4c56cd9f9addb014a/docs/data_overview.html" target="_blank">19be390</a>
-</td>
-<td>
-hwittich
-</td>
-<td>
-2021-01-29
-</td>
-<td>
-Build site.
-</td>
-</tr>
-<tr>
-<td>
-Rmd
-</td>
-<td>
-<a href="https://github.com/hwittich/TWAS_for_protein/blob/a371d7a43c707d33fc0586365a31bba30c9e7d8a/analysis/data_overview.Rmd" target="_blank">a371d7a</a>
-</td>
-<td>
-hwittich
-</td>
-<td>
-2021-01-29
-</td>
-<td>
-Updated the project description and made a page describing the data.
-</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -634,20 +600,25 @@ Updated the project description and made a page describing the data.
 </div>
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>For this test run, I’m working with data from the AFA population group of the Trans-Omics for Precision Medicine (TOPMed) cohort.</p>
-</div>
-<div id="dosage-file" class="section level1">
-<h1>Dosage File</h1>
-<p>We are starting with a dosage file, as formatted below:</p>
-<pre class="r"><code>head &lt;- c(&quot;chromosome&quot;,&quot;variant_id&quot;,&quot;position&quot;,&quot;A1&quot;,&quot;A2&quot;,&quot;MAF&quot;,&quot;id1 ... idn&quot;)
-head</code></pre>
-<pre><code>[1] &quot;chromosome&quot;  &quot;variant_id&quot;  &quot;position&quot;    &quot;A1&quot;          &quot;A2&quot;         
-[6] &quot;MAF&quot;         &quot;id1 ... idn&quot;</code></pre>
-<p>Each row in the dosage file corresponds with a SNP. The “chromosome” field lists the chromosome code, and the “position” field contains the base-pair position of each SNP. The “variant_id” field stores the SNP code, which is a concatenation of the chromosome code and base-pair location. The “A1” and “A2” fields list the allele 1 and allele 2 codes, respectively, and the “MAF” field contains the frequency of allele 2. Finally, at the end of the file are n columns of dosage values, where n is the number of individuals in the dataset.</p>
-</div>
-<div id="protein-expression-file" class="section level1">
-<h1>Protein Expression File</h1>
-<p>Each row corresponds to a protein (we are only working with one at the moment) and each column corresponds to an individual.</p>
+<p>On this page, I will detail the process of running PrediXcan.</p>
+<p>First, I will perform the prediction step, which predicts gene expression.</p>
+<pre><code>python3 /home/wheelerlab3/MetaXcan/software/Predict.py \
+--model_db_path /home/henry/TWAS_for_protein/TOPMed_Test_Data/en_Whole_Blood.db \
+--text_genotypes /home/henry/TWAS_for_protein/TOPMed_Test_Data/nohead_hg38chr22.maf0.01.R20.8.dosage.txt \
+--text_sample_ids /home/henry/TWAS_for_protein/TOPMed_Test_Data/samples.txt \
+--prediction_output /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_predict.h5 HDF5 \
+--prediction_summary_output /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_predict.log</code></pre>
+<p>Next, using the output files from the first step, I will run the association step. First, I had to transpose the columns and rows of the protein expression file. I wanted all of the expression data to be in one column, but at present it was all stored in the first row. I performed the following bash commands:</p>
+<pre class="r"><code>df &lt;- read.table(&#39;/home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression_for_HENRY.txt&#39;,header=TRUE)
+df2 &lt;- data.frame(t(df[]))
+colnames(df2) &lt;- df[,1]
+write.table(df2,&quot;/home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression.txt&quot;,sep=&quot;\t&quot;,col.names=FALSE)</code></pre>
+<p>Then, I ran the association script.</p>
+<pre><code>python3 /home/wheelerlab3/MetaXcan/software/PrediXcanAssociation.py \
+--hdf5_expression_file /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_predict.h5 \
+--input_phenos_file /home/henry/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression.txt \
+--input_phenos_column SL011772_ENSG00000100029.18 \
+--output /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_association.txt </code></pre>
 <br>
 <p>
 <button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">

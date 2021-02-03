@@ -1,0 +1,40 @@
+---
+title: "running_PrediXcan"
+author: "hwittich"
+date: "2021-02-02"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+On this page, I will detail the process of running PrediXcan.
+
+First, I will perform the prediction step, which predicts gene expression.
+```{}
+python3 /home/wheelerlab3/MetaXcan/software/Predict.py \
+--model_db_path /home/henry/TWAS_for_protein/TOPMed_Test_Data/en_Whole_Blood.db \
+--text_genotypes /home/henry/TWAS_for_protein/TOPMed_Test_Data/nohead_hg38chr22.maf0.01.R20.8.dosage.txt \
+--text_sample_ids /home/henry/TWAS_for_protein/TOPMed_Test_Data/samples.txt \
+--prediction_output /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_predict.h5 HDF5 \
+--prediction_summary_output /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_predict.log
+```
+
+Next, using the output files from the first step, I will run the association step.
+First, I had to transpose the columns and rows of the protein expression file. I wanted all of the expression data to be in one column, but at present it was all stored in the first row. I performed the following bash commands:
+```{r}
+df <- read.table('/home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression_for_HENRY.txt',header=TRUE)
+df2 <- data.frame(t(df[]))
+colnames(df2) <- df[,1]
+write.table(df2,"/home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression.txt",sep="\t",col.names=FALSE)
+```
+
+Then, I ran the association script.
+```{}
+python3 /home/wheelerlab3/MetaXcan/software/PrediXcanAssociation.py \
+--hdf5_expression_file /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_predict.h5 \
+--input_phenos_file /home/henry/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression.txt \
+--input_phenos_column SL011772_ENSG00000100029.18 \
+--output /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_association.txt 
+```
+

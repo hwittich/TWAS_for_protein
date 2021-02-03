@@ -13,10 +13,10 @@ For this test run, I'm working with data from the AFA population group of the Tr
 # Dosage File
 We are starting with a dosage file, as formatted below:
 ```{r}
-head <- c("CHR","SNP","BP","A1","A2","?","Fn","In")
+head <- c("chromosome","variant_id","position","A1","A2","MAF","id1 ... idn")
 head
 ```
-Each row in the dosage file corresponds with a SNP. The "CHR" field lists the chromosome code, and the "BP" field contains the base-pair position of each SNP. The "SNP" field stores the SNP code, which is a concatenation of the chromosome code and base-pair location. The "A1" and "A2" fields list the allele 1 and allele 2 codes, respectively, and the "?" contains ??? a p-value? a quality metric? not sure. FInally, at the end of each line, there are n pairs of dosage values (?), where n is the number of genotyped individuals. The IDs for these individuals can be found in the samples.txt data file.
+Each row in the dosage file corresponds with a SNP. The "chromosome" field lists the chromosome code, and the "position" field contains the base-pair position of each SNP. The "variant_id" field stores the SNP code, which is a concatenation of the chromosome code and base-pair location. The "A1" and "A2" fields list the allele 1 and allele 2 codes, respectively, and the "MAF" field contains the frequency of allele 2. Finally, at the end of the file are n columns of dosage values, where n is the number of individuals in the dataset.
 
 # Protein Expression File
 Each row corresponds to a protein (we are only working with one at the moment) and each column corresponds to an individual. 

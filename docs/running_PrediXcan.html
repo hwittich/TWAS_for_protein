@@ -517,16 +517,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreee37507f9d5c97621086726d90fe065cad721f07btargetblanke37507fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/hwittich/TWAS_for_protein/tree/e37507f9d5c97621086726d90fe065cad721f07b" target="_blank">e37507f</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreefcf169041c80028266799bf5ef47034d12cc2c06targetblankfcf1690a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/hwittich/TWAS_for_protein/tree/fcf169041c80028266799bf5ef47034d12cc2c06" target="_blank">fcf1690</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreee37507f9d5c97621086726d90fe065cad721f07btargetblanke37507fa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreefcf169041c80028266799bf5ef47034d12cc2c06targetblankfcf1690a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/hwittich/TWAS_for_protein/tree/e37507f9d5c97621086726d90fe065cad721f07b" target="_blank">e37507f</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/hwittich/TWAS_for_protein/tree/fcf169041c80028266799bf5ef47034d12cc2c06" target="_blank">fcf1690</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -579,6 +579,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/hwittich/TWAS_for_protein/blob/fcf169041c80028266799bf5ef47034d12cc2c06/analysis/running_PrediXcan.Rmd" target="_blank">fcf1690</a>
+</td>
+<td>
+hwittich
+</td>
+<td>
+2021-02-03
+</td>
+<td>
+Filling out some details about my input data and re-running Predict.py, but
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/hwittich/TWAS_for_protein/75389f4f61e197f3815a98c3d28c2dd483d4031c/docs/running_PrediXcan.html" target="_blank">75389f4</a>
+</td>
+<td>
+hwittich
+</td>
+<td>
+2021-02-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/hwittich/TWAS_for_protein/blob/e37507f9d5c97621086726d90fe065cad721f07b/analysis/running_PrediXcan.Rmd" target="_blank">e37507f</a>
 </td>
 <td>
@@ -604,10 +638,13 @@ First run of PrediXcan
 <p>First, I will perform the prediction step, which predicts gene expression.</p>
 <pre><code>python3 /home/wheelerlab3/MetaXcan/software/Predict.py \
 --model_db_path /home/henry/TWAS_for_protein/TOPMed_Test_Data/en_Whole_Blood.db \
+--model_db_snp_key varID \
 --text_genotypes /home/henry/TWAS_for_protein/TOPMed_Test_Data/nohead_hg38chr22.maf0.01.R20.8.dosage.txt \
 --text_sample_ids /home/henry/TWAS_for_protein/TOPMed_Test_Data/samples.txt \
---prediction_output /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_predict.h5 HDF5 \
---prediction_summary_output /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_predict.log</code></pre>
+--prediction_output /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_predict.txt \
+--prediction_summary_output /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_predict_summary.txt</code></pre>
+<p>It seems like this isn’t working as I intended. While the program is running, it states that “0% of models’ snps used” and the output file only has two columns (FID and IID from samples.txt). I think it’s an issue with the IDs from the dosage file not matching the IDs in the database file. The documentation states:</p>
+<p>“Or the model might have some variants without rsids, for example, the MASHR models. So the GEUVADIS genotypes and MASHR models will need to use varIDs to predict expression. The argument –on_the_fly_mapping METADATA builds an ID for each variant in the VCF, which can be matched to the varID in the prediction model. –model_db_snp_key varID specifies that the varID column, instead of rsid, should be used to match genotype variants. If both genotypes and models are in hg37, use arguments –model_db_path, –model_db_snp_key varID, –vcf_genotypes, –vcf_mode, –on_the_fly_mapping METADATA”{}<em>{}</em>{}<em>{}<em>b37“, –prediction_output, –prediction_summary_output. The –on_the_fly_mapping depends on the varID format in the model, so for MASHR models, it should be”chr{}</em>{}</em>{}_{}_b38“. The –on_the_fly_mapping argument is not necessary for text dosages, however, the –model_db_snp_key argument can be used depending on whether the text files have rsids or varIDs.”</p>
 <p>Next, using the output files from the first step, I will run the association step. First, I had to transpose the columns and rows of the protein expression file. I wanted all of the expression data to be in one column, but at present it was all stored in the first row. I performed the following bash commands:</p>
 <pre class="r"><code>df &lt;- read.table(&#39;/home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression_for_HENRY.txt&#39;,header=TRUE)
 df2 &lt;- data.frame(t(df[]))

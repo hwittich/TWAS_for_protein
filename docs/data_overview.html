@@ -517,16 +517,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreee37507f9d5c97621086726d90fe065cad721f07btargetblanke37507fa"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/hwittich/TWAS_for_protein/tree/e37507f9d5c97621086726d90fe065cad721f07b" target="_blank">e37507f</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreefcf169041c80028266799bf5ef47034d12cc2c06targetblankfcf1690a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/hwittich/TWAS_for_protein/tree/fcf169041c80028266799bf5ef47034d12cc2c06" target="_blank">fcf1690</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreee37507f9d5c97621086726d90fe065cad721f07btargetblanke37507fa" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreefcf169041c80028266799bf5ef47034d12cc2c06targetblankfcf1690a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/hwittich/TWAS_for_protein/tree/e37507f9d5c97621086726d90fe065cad721f07b" target="_blank">e37507f</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/hwittich/TWAS_for_protein/tree/fcf169041c80028266799bf5ef47034d12cc2c06" target="_blank">fcf1690</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -574,6 +574,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/hwittich/TWAS_for_protein/blob/fcf169041c80028266799bf5ef47034d12cc2c06/analysis/data_overview.Rmd" target="_blank">fcf1690</a>
+</td>
+<td>
+hwittich
+</td>
+<td>
+2021-02-03
+</td>
+<td>
+Filling out some details about my input data and re-running Predict.py, but
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/hwittich/TWAS_for_protein/75389f4f61e197f3815a98c3d28c2dd483d4031c/docs/data_overview.html" target="_blank">75389f4</a>
+</td>
+<td>
+hwittich
+</td>
+<td>
+2021-02-03
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -644,6 +678,12 @@ head</code></pre>
 <pre><code>[1] &quot;chromosome&quot;  &quot;variant_id&quot;  &quot;position&quot;    &quot;A1&quot;          &quot;A2&quot;         
 [6] &quot;MAF&quot;         &quot;id1 ... idn&quot;</code></pre>
 <p>Each row in the dosage file corresponds with a SNP. The “chromosome” field lists the chromosome code, and the “position” field contains the base-pair position of each SNP. The “variant_id” field stores the SNP code, which is a concatenation of the chromosome code and base-pair location. The “A1” and “A2” fields list the allele 1 and allele 2 codes, respectively, and the “MAF” field contains the frequency of allele 2. Finally, at the end of the file are n columns of dosage values, where n is the number of individuals in the dataset.</p>
+</div>
+<div id="db-file" class="section level1">
+<h1>DB File</h1>
+<p>SQLite database, built from elastic net (en) models. GTEx_v8_en<br />
+“Prediction models are SQLite databases with two tables, weights and extra. The weights table has columns gene rsid varID ref_allele eff_allele weight, where each variant has an ID with the format chr_pos_ref_eff_build. For example, the snp rs115095900 has variant ID chr10_101056744_G_C_b37. GTEx v8 model variants have the string chr in front,”</p>
+<p>#Samples.txt two columns, they are the same: FID, family ID, and IID, individual ID</p>
 </div>
 <div id="protein-expression-file" class="section level1">
 <h1>Protein Expression File</h1>

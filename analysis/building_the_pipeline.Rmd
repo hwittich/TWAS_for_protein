@@ -1,0 +1,11 @@
+---
+title: "building_the_pipeline"
+author: "hwittich"
+date: "2021-02-26"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+Now that I have successfully run the PrediXcan software and found significant associations between SNPs on chromsome 22 of individuals in the AFA population and their levels of the protein, SLO11772_ENSG00000100029.18, the next step is to perform the same analysis on a bigger set of data, building a pipeline in the process. All of this will be handle in the python wrapper:

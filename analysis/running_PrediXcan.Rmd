@@ -17,13 +17,14 @@ python3 /home/wheelerlab3/MetaXcan/software/Predict.py \
 --model_db_snp_key varID \
 --text_genotypes /home/henry/TWAS_for_protein/TOPMed_Test_Data/nohead_hg38chr22.maf0.01.R20.8.dosage.txt \
 --text_sample_ids /home/henry/TWAS_for_protein/TOPMed_Test_Data/samples.txt \
+--on_the_fly_mapping METADATA "chr{}_{}_{}_{}_b38" \
 --prediction_output /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_predict.txt \
 --prediction_summary_output /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_predict_summary.txt
 ```
-It seems like this isn't working as I intended. While the program is running, it states that "0% of models' snps used" and the output file only has two columns (FID and IID from samples.txt). I think it's an issue with the IDs from the dosage file not matching the IDs in the database file. The documentation states:   
-
-"Or the model might have some variants without rsids, for example, the MASHR models. So the GEUVADIS genotypes and MASHR models will need to use varIDs to predict expression. The argument --on_the_fly_mapping METADATA builds an ID for each variant in the VCF, which can be matched to the varID in the prediction model. --model_db_snp_key varID specifies that the varID column, instead of rsid, should be used to match genotype variants. If both genotypes and models are in hg37, use arguments --model_db_path, --model_db_snp_key varID, --vcf_genotypes, --vcf_mode, --on_the_fly_mapping METADATA "{}_{}_{}_{}_b37", --prediction_output, --prediction_summary_output. The --on_the_fly_mapping depends on the varID format in the model, so for MASHR models, it should be "chr{}_{}_{}_{}_b38". The --on_the_fly_mapping argument is not necessary for text dosages, however, the --model_db_snp_key argument can be used depending on whether the text files have rsids or varIDs."
-
+Producing the following output files:   
+-- Whole_Blood_predict.txt   
+-- Whole_Blood_predict_summary.txt
+During run-time, the program stated it used 2% of models' snps.
 
 Next, using the output files from the first step, I will run the association step.
 First, I had to transpose the columns and rows of the protein expression file. I wanted all of the expression data to be in one column, but at present it was all stored in the first row. I performed the following bash commands:
@@ -37,9 +38,16 @@ write.table(df2,"/home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/test_pro
 Then, I ran the association script.
 ```{}
 python3 /home/wheelerlab3/MetaXcan/software/PrediXcanAssociation.py \
---hdf5_expression_file /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_predict.h5 \
+--expression_file /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_predict.txt \
 --input_phenos_file /home/henry/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression.txt \
 --input_phenos_column SL011772_ENSG00000100029.18 \
---output /home/henry/TWAS_for_protein/output/2-2-2021/Whole_Blood_association.txt 
+--output /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_association.txt 
+```
+Quick plot
+```{r}
+#read in results
+library(qqman)
+data <- read.table("/home/hwittich/mount/TWAS_for_protein/output/2-3-2021/Whole_Blood_association.txt",header=T)
+qq(data$pvalue)
 ```
 

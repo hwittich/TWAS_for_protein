@@ -61,7 +61,7 @@ sample_IDs = lines[0].split(" ") #header of each column is a sample ID #space se
 #Making samples.txt file
 samples_file = open(samples,'w')
 for ID in sample_IDs[1:]:
-    print(ID)
+    #print(ID)
     samples_file.write(str(ID.rstrip())+"\t"+str(ID.rstrip())+"\n")
 samples_file.close()
 
@@ -97,14 +97,15 @@ for row in lines[1:]: #each row pertains to 1 protein. #skip first line with hea
     #Move through list of sample IDs (same length as list of protein levels) and write the sample ID followed by the protein level
     for i in range(1,len(sample_IDs)):
         protein_file.write(str(sample_IDs[i]).rstrip()+"\t"+str(sample_IDs[i]).rstrip()+"\t"+str(protein_levels[i]).rstrip()+"\n")
+    #close protein file
+    protein_file.close()
 
     #Now use this protein expression file to run prediXcan!
     association_command = "python3 "+scripts+"/PrediXcanAssociation.py "
     association_command = association_command + "--expression_file "+outfile+"/Whole_Blood_predict.txt "
-    association_command = association_command + "--input_phenos_file "+outfile+"/protein_levels/"+protein_ID+".txt "
+    association_command = association_command + "--input_phenos_file "+outfile+"/protein_levels/"+str(protein_ID)+".txt "
     association_command = association_command + "--input_phenos_column "+str(protein_ID)+" "
     association_command = association_command + "--output "+outfile+"/Whole_Blood_"+str(protein_ID)+"_association.txt "
+    #print("running association for "+str(protein_ID))
+    #print(association_command)
     os.system(association_command)
-
-    #close protein file
-    protein_file.close()

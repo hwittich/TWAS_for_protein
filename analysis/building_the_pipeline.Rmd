@@ -8,4 +8,9 @@ editor_options:
 ---
 
 ## Introduction
-Now that I have successfully run the PrediXcan software and found significant associations between SNPs on chromsome 22 of individuals in the AFA population and their levels of the protein, SLO11772_ENSG00000100029.18, the next step is to perform the same analysis on a bigger set of data, building a pipeline in the process. All of this will be handle in the python wrapper:
+Now that I have successfully run the PrediXcan software and found significant associations between SNPs on chromsome 22 of individuals in the AFA population and their levels of the protein, SLO11772_ENSG00000100029.18, the next step is to perform the same analysis on a bigger set of data, building a pipeline in the process. All of this will be handled in the python wrapper:   
+-- protein_association.py
+```{}
+python3 protein_association.py --dosages /home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/nohead_hg38chr22.maf0.01.R20.8.dosage.txt --exp /home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/en_Whole_Blood.db --proteins /home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression.txt --samples /home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/samples.txt 
+```
+

@@ -18,8 +18,8 @@ python3 /home/wheelerlab3/MetaXcan/software/Predict.py \
 --text_genotypes /home/henry/TWAS_for_protein/TOPMed_Test_Data/nohead_hg38chr22.maf0.01.R20.8.dosage.txt \
 --text_sample_ids /home/henry/TWAS_for_protein/TOPMed_Test_Data/samples.txt \
 --on_the_fly_mapping METADATA "chr{}_{}_{}_{}_b38" \
---prediction_output /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_predict.txt \
---prediction_summary_output /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_predict_summary.txt
+--prediction_output /home/henry/TWAS_for_protein/output/3-17-2021/test/Whole_Blood_predict.txt \
+--prediction_summary_output /home/henry/TWAS_for_protein/output/3-17-2021/test/Whole_Blood_predict_summary.txt
 ```
 Producing the following output files:   
 -- Whole_Blood_predict.txt   
@@ -27,27 +27,24 @@ Producing the following output files:
 During run-time, the program stated it used 2% of models' snps.
 
 Next, using the output files from the first step, I will run the association step.
-First, I had to transpose the columns and rows of the protein expression file. I wanted all of the expression data to be in one column, but at present it was all stored in the first row. I performed the following bash commands:
-```{r}
-df <- read.table('/home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression_for_HENRY.txt',header=TRUE)
-df2 <- data.frame(t(df[]))
-colnames(df2) <- df[,1]
-write.table(df2,"/home/hwittich/mount/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression.txt",sep="\t",col.names=FALSE)
-```
+First, I had to transpose the columns and rows of the protein expression file. I wanted all of the expression data to be in one column, but at present it was all stored in the first row. I ran the following python script:
+-- make_samples_list.py   
+producing:
+-- ENSG00000100029.18.txt   
 
 Then, I ran the association script.
 ```{}
 python3 /home/wheelerlab3/MetaXcan/software/PrediXcanAssociation.py \
---expression_file /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_predict.txt \
---input_phenos_file /home/henry/TWAS_for_protein/TOPMed_Test_Data/test_prot_expression.txt \
---input_phenos_column SL011772_ENSG00000100029.18 \
---output /home/henry/TWAS_for_protein/output/2-3-2021/Whole_Blood_association.txt 
+--expression_file /home/henry/TWAS_for_protein/output/3-17-2021/test/Whole_Blood_predict.txt \
+--input_phenos_file /home/henry/TWAS_for_protein/TOPMed_Test_Data/ENSG00000100029.18.txt \
+--input_phenos_column ENSG00000100029.18 \
+--output /home/henry/TWAS_for_protein/output/3-17-2021/test/Whole_Blood_association.txt
 ```
 Quick plot
 ```{r}
 #read in results
 library(qqman)
-data <- read.table("/home/hwittich/mount/TWAS_for_protein/output/2-3-2021/Whole_Blood_association.txt",header=T)
+data <- read.table("/home/hwittich/mount/TWAS_for_protein/output/3-17-2021/test/Whole_Blood_association.txt",header=T)
 qq(data$pvalue)
 ```
 

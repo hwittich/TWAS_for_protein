@@ -90,7 +90,7 @@ os.system(predict_command)
 for row in lines[1:]: #each row pertains to 1 protein. #skip first line with headers
     #Make a temporary file where column 1 is sample IDs and column two is protein levels for current protein
     protein_levels = row.split(" ") #split line around separator
-    protein_ID = str(protein_levels[0].split("_")[1]).rstrip() #Joint ID format <soma ID>_<ensembl ID> #Take the ensembl ID
+    protein_ID = str(protein_levels[0].split("_")[0]).rstrip() #Joint ID format <somascan (SL) ID>_<ensembl ID> #Take the SL ID
     protein_file = open(outfile+"/protein_levels/"+protein_ID+".txt",'w') #open file to write transpose protein levels
     #Line 1, write headers
     protein_file.write("FID\tIID\t"+str(protein_ID)+"\n")

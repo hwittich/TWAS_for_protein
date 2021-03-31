@@ -42,13 +42,16 @@ sig_hits <- filter(protein_associations,pvalue<bonferroni_threshold) %>% separat
 Now, for every significant hit, we want to compare the predicted transcript and the protein it is associated with. By comparing the location of each, we can determine if we have a cis-acting or trans-acting hit.
 ```{r}
 #Let's pull in the chromosomal coordinates of the predicted transcript
-gene_annotation <- read.table("/home/hwittich/mount/TWAS_for_protein/TOPMed_ALL_data/gene_annotation_hg38_sanitized_BP_CHROM.txt",header=T,sep=" ") %>%
-  select(gene_id,chrchr,start)
+gene_annotation <- read.table("/home/hwittich/mount/TWAS_for_protein/TOPMed_ALL_data/gene_annotation_hg38_sanitized_BP_CHROM.txt",header=T,sep=" ") %>% select(gene_id,chrchr,start)
 sig_hits <- left_join(sig_hits, gene_annotation, by = c("gene_id"="gene_id"), copy=TRUE) %>% rename("gene_chr"="chrchr","gene_start"="start")
 
 #Now let's pull in the chromosomal coordinates of the associated protein
 protein_annotation <- read.table("/home/hwittich/mount/TWAS_for_protein/TOPMed_ALL_data/somascan1.3k_gencode.v32_annotation.txt",header=T,sep="\t") %>% select(SomaId,ENSG_id,chr,start) %>% rename("protein_ID"="ENSG_id","protein_chr"="chr","protein_start"="start")
 sig_hits <- left_join(sig_hits,protein_annotation, by = c("protein"="SomaId"), copy=TRUE)
+
+#Label the multigene aptamers
+multigene_aptamers <- read.table("/home/hwittich/mount/TWAS_for_protein/TOPMed_ALL_data/multigene_aptamers.txt",header = T) %>% separate(joint_ID,sep="_",into=c("SL_ID","ENSG_ID"))
+sig_hits <- mutate(sig_hits, multigene = ifelse(protein%in%multigene_aptamers$SL_ID,TRUE,FALSE))
 ```
 Next, we have to correct the positions of each gene so that they're relative to the whole genome, not just the chromosome they're on.
 ```{r}
@@ -71,14 +74,15 @@ sig_hits<-left_join(sig_hits,chr_len,by=c("protein_chr"="chromosomes"),copy=TRUE
 sig_hits<-mutate(sig_hits,new_protein_start = protein_chr_start + protein_start) %>% mutate(new_gene_start = gene_chr_start+gene_start)
 
 #Then, let's compare the positions to determine if a gene is trans-acting or cis-acting
-sig_hits<-mutate(sig_hits,cis_trans = ifelse((new_gene_start-500)<=new_protein_start & new_protein_start<=(new_gene_start+500),"cis-acting","trans-acting"))
+sig_hits<-mutate(sig_hits,cis_trans = ifelse((new_gene_start-1000000)<=new_protein_start & new_protein_start<=(new_gene_start+1000000),"cis-acting","trans-acting"))
 ```
 
 Now let's plot the chromosomal position of the transcript vs the chromosomal position of the associated protein for every significant hit!
 ```{r}
 library(ggplot2)
-ggplot(sig_hits,aes(x=new_gene_start,y=new_protein_start,size=pvalue,color=cis_trans)) + 
-  geom_point(shape=21) + 
+ggplot(sig_hits,aes(x=new_gene_start,y=new_protein_start,size=pvalue,color=cis_trans,group=multigene)) + 
+  geom_point(aes(shape=multigene)) + 
+  scale_shape_manual(values=c(21,22)) +
   scale_size_continuous(guide=FALSE) + 
   scale_color_manual(values=c("dark gray","dark red"),na.value="dark gray") +
   geom_hline(yintercept=starts[1:22],size=0.1) + 

@@ -426,7 +426,7 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-03-23
+<strong>Last updated:</strong> 2021-03-30
 </p>
 <p>
 <strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
@@ -517,16 +517,16 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreef63a176d903e035678bd970db45a5ce86f8bb67dtargetblankf63a176a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/hwittich/TWAS_for_protein/tree/f63a176d903e035678bd970db45a5ce86f8bb67d" target="_blank">f63a176</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreea1d9cc523196dadaf5ce256861fd97a7c973b771targetblanka1d9cc5a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/hwittich/TWAS_for_protein/tree/a1d9cc523196dadaf5ce256861fd97a7c973b771" target="_blank">a1d9cc5</a> </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreef63a176d903e035678bd970db45a5ce86f8bb67dtargetblankf63a176a" class="panel-collapse collapse">
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintreea1d9cc523196dadaf5ce256861fd97a7c973b771targetblanka1d9cc5a" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/hwittich/TWAS_for_protein/tree/f63a176d903e035678bd970db45a5ce86f8bb67d" target="_blank">f63a176</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/hwittich/TWAS_for_protein/tree/a1d9cc523196dadaf5ce256861fd97a7c973b771" target="_blank">a1d9cc5</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -580,6 +580,40 @@ Message
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+Rmd
+</td>
+<td>
+<a href="https://github.com/hwittich/TWAS_for_protein/blob/a1d9cc523196dadaf5ce256861fd97a7c973b771/analysis/building_the_pipeline.Rmd" target="_blank">a1d9cc5</a>
+</td>
+<td>
+hwittich
+</td>
+<td>
+2021-03-30
+</td>
+<td>
+Corrected definition of cis- and trans-acting elemtents and labeled the multigene aptamers in final coordinate plot.
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/hwittich/TWAS_for_protein/541155c9ab2b930c39b9fd0312acd970b8571c4a/docs/building_the_pipeline.html" target="_blank">541155c</a>
+</td>
+<td>
+hwittich
+</td>
+<td>
+2021-03-23
+</td>
+<td>
+Build site.
+</td>
+</tr>
 <tr>
 <td>
 Rmd
@@ -823,13 +857,16 @@ bonferroni_threshold=alpha/(n_proteins*n_transcripts)
 sig_hits &lt;- filter(protein_associations,pvalue&lt;bonferroni_threshold) %&gt;% separate(gene,sep=&quot;\\.&quot;,into=c(&quot;gene_id&quot;,&quot;gene_version&quot;))</code></pre>
 <p>Now, for every significant hit, we want to compare the predicted transcript and the protein it is associated with. By comparing the location of each, we can determine if we have a cis-acting or trans-acting hit.</p>
 <pre class="r"><code>#Let&#39;s pull in the chromosomal coordinates of the predicted transcript
-gene_annotation &lt;- read.table(&quot;/home/hwittich/mount/TWAS_for_protein/TOPMed_ALL_data/gene_annotation_hg38_sanitized_BP_CHROM.txt&quot;,header=T,sep=&quot; &quot;) %&gt;%
-  select(gene_id,chrchr,start)
+gene_annotation &lt;- read.table(&quot;/home/hwittich/mount/TWAS_for_protein/TOPMed_ALL_data/gene_annotation_hg38_sanitized_BP_CHROM.txt&quot;,header=T,sep=&quot; &quot;) %&gt;% select(gene_id,chrchr,start)
 sig_hits &lt;- left_join(sig_hits, gene_annotation, by = c(&quot;gene_id&quot;=&quot;gene_id&quot;), copy=TRUE) %&gt;% rename(&quot;gene_chr&quot;=&quot;chrchr&quot;,&quot;gene_start&quot;=&quot;start&quot;)
 
 #Now let&#39;s pull in the chromosomal coordinates of the associated protein
 protein_annotation &lt;- read.table(&quot;/home/hwittich/mount/TWAS_for_protein/TOPMed_ALL_data/somascan1.3k_gencode.v32_annotation.txt&quot;,header=T,sep=&quot;\t&quot;) %&gt;% select(SomaId,ENSG_id,chr,start) %&gt;% rename(&quot;protein_ID&quot;=&quot;ENSG_id&quot;,&quot;protein_chr&quot;=&quot;chr&quot;,&quot;protein_start&quot;=&quot;start&quot;)
-sig_hits &lt;- left_join(sig_hits,protein_annotation, by = c(&quot;protein&quot;=&quot;SomaId&quot;), copy=TRUE)</code></pre>
+sig_hits &lt;- left_join(sig_hits,protein_annotation, by = c(&quot;protein&quot;=&quot;SomaId&quot;), copy=TRUE)
+
+#Label the multigene aptamers
+multigene_aptamers &lt;- read.table(&quot;/home/hwittich/mount/TWAS_for_protein/TOPMed_ALL_data/multigene_aptamers.txt&quot;,header = T) %&gt;% separate(joint_ID,sep=&quot;_&quot;,into=c(&quot;SL_ID&quot;,&quot;ENSG_ID&quot;))
+sig_hits &lt;- mutate(sig_hits, multigene = ifelse(protein%in%multigene_aptamers$SL_ID,TRUE,FALSE))</code></pre>
 <p>Next, we have to correct the positions of each gene so that they’re relative to the whole genome, not just the chromosome they’re on.</p>
 <pre class="r"><code>chromosomes&lt;-c(&quot;chr1&quot;,&quot;chr2&quot;,&quot;chr3&quot;,&quot;chr4&quot;,&quot;chr5&quot;,&quot;chr6&quot;,&quot;chr7&quot;,&quot;chr8&quot;,&quot;chr9&quot;,&quot;chr10&quot;,&quot;chr11&quot;,&quot;chr12&quot;,&quot;chr13&quot;,&quot;chr14&quot;,&quot;chr15&quot;,&quot;chr16&quot;,&quot;chr17&quot;,&quot;chr18&quot;,&quot;chr19&quot;,&quot;chr20&quot;,&quot;chr21&quot;,&quot;chr22&quot;,&quot;chrX&quot;,&quot;chrY&quot;)
 lengths&lt;-c(248956422,242193529,198295559,190214555,181538259,170805979,159345973,145138636,138394717,133797422,135086622,133275309,114364328,107043718,101991189,90338345,83257441,80373285,58617616,64444167,46709983,50818468,156040895,57227415)
@@ -850,11 +887,12 @@ sig_hits&lt;-left_join(sig_hits,chr_len,by=c(&quot;protein_chr&quot;=&quot;chrom
 sig_hits&lt;-mutate(sig_hits,new_protein_start = protein_chr_start + protein_start) %&gt;% mutate(new_gene_start = gene_chr_start+gene_start)
 
 #Then, let&#39;s compare the positions to determine if a gene is trans-acting or cis-acting
-sig_hits&lt;-mutate(sig_hits,cis_trans = ifelse((new_gene_start-500)&lt;=new_protein_start &amp; new_protein_start&lt;=(new_gene_start+500),&quot;cis-acting&quot;,&quot;trans-acting&quot;))</code></pre>
+sig_hits&lt;-mutate(sig_hits,cis_trans = ifelse((new_gene_start-1000000)&lt;=new_protein_start &amp; new_protein_start&lt;=(new_gene_start+1000000),&quot;cis-acting&quot;,&quot;trans-acting&quot;))</code></pre>
 <p>Now let’s plot the chromosomal position of the transcript vs the chromosomal position of the associated protein for every significant hit!</p>
 <pre class="r"><code>library(ggplot2)
-ggplot(sig_hits,aes(x=new_gene_start,y=new_protein_start,size=pvalue,color=cis_trans)) + 
-  geom_point(shape=21) + 
+ggplot(sig_hits,aes(x=new_gene_start,y=new_protein_start,size=pvalue,color=cis_trans,group=multigene)) + 
+  geom_point(aes(shape=multigene)) + 
+  scale_shape_manual(values=c(21,22)) +
   scale_size_continuous(guide=FALSE) + 
   scale_color_manual(values=c(&quot;dark gray&quot;,&quot;dark red&quot;),na.value=&quot;dark gray&quot;) +
   geom_hline(yintercept=starts[1:22],size=0.1) + 
@@ -889,6 +927,17 @@ Date
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>
+<a href="https://github.com/hwittich/TWAS_for_protein/blob/541155c9ab2b930c39b9fd0312acd970b8571c4a/docs/figure/building_the_pipeline.Rmd/unnamed-chunk-5-1.png" target="_blank">541155c</a>
+</td>
+<td>
+hwittich
+</td>
+<td>
+2021-03-23
+</td>
+</tr>
 <tr>
 <td>
 <a href="https://github.com/hwittich/TWAS_for_protein/blob/1fc36c25cc3d62d3b28f7956f3e10af589987d5c/docs/figure/building_the_pipeline.Rmd/unnamed-chunk-5-1.png" target="_blank">1fc36c2</a>

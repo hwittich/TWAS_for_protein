@@ -17,7 +17,7 @@ protein_associations <- read.table(results,header=TRUE,sep="\t")
 #=0.5/((#proteins tested * #transcripts predicted)/total # of tests)
 ###These values are specific to my input data and may need to be adjusted
 n_proteins<-1279 #length of protein matrix (sort of, duplicates were removed)
-n_transcripts<-6689 #length of association output
+n_transcripts<-(length(protein_associations$gene)-1)/n_proteins #length of association output
 alpha<-0.05
 bonferroni_threshold=alpha/(n_proteins*n_transcripts)
 #Filter out non-significant pairs
@@ -27,7 +27,7 @@ sig_hits <- filter(protein_associations,pvalue<bonferroni_threshold) %>% separat
 gene_annotation <- read.table(gene_anno,header=T,sep=" ") %>% select(gene_id,chrchr,start)
 sig_hits <- left_join(sig_hits, gene_annotation, by = c("gene_id"="gene_id"), copy=TRUE) %>% rename("gene_chr"="chrchr","gene_start"="start")
 
-protein_annotation <- read.table(protein_anno,header=T,sep="\t") %>% select(SomaID,ENSG_id,chr,start) %>% rename("protein_ID"="ENSG_id","protein_chr"="chr","protein_start"="start")
+protein_annotation <- read.table(protein_anno,header=T,sep="\t") %>% select(SomaId,ENSG_id,chr,start) %>% rename("protein_ID"="ENSG_id","protein_chr"="chr","protein_start"="start")
 sig_hits <- left_join(sig_hits,protein_annotation, by = c("protein"="SomaId"), copy=TRUE)
 
 #Label the multigene aptamers

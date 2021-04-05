@@ -1,0 +1,15 @@
+---
+title: "run_every_tissue"
+author: "hwittich"
+date: "2021-04-05"
+output: workflowr::wflow_html
+editor_options:
+  chunk_output_type: console
+---
+
+## Introduction
+
+```{}
+nohup python3 code/protein_TWAS.py --dose TOPMed_ALL_data/dosages --exp TOPMed_ALL_data/elastic_net_models/ --prot TOPMed_ALL_data/Proteome_TOPMed_ALL_ln_adjAgeSex_mean_rank-inverse_adj10PCair_MEQTL_reformatted_ids_sorted.txt --samples TOPMed_ALL_data/samples.txt --genes TOPMed_ALL_data/gene_annotation_hg38_sanitized_BP_CHROM.txt --aptamers TOPMed_ALL_data/somascan1.3k_gencode.v32_annotation.txt --out output/4-6-2021 &
+```
+

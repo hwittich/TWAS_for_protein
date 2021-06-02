@@ -15,13 +15,22 @@
 
 <title>run_every_tissue</title>
 
-<script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.7/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
 <script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
 <script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
@@ -51,11 +60,6 @@ div.section {
     </style>
 
 <style type="text/css">code{white-space: pre;}</style>
-<style type="text/css">
-  pre:not([class]) {
-    background-color: white;
-  }
-</style>
 <script type="text/javascript">
 if (window.hljs) {
   hljs.configure({languages: []});
@@ -68,32 +72,6 @@ if (window.hljs) {
 
 
 
-<style type="text/css">
-h1 {
-  font-size: 34px;
-}
-h1.title {
-  font-size: 38px;
-}
-h2 {
-  font-size: 30px;
-}
-h3 {
-  font-size: 24px;
-}
-h4 {
-  font-size: 18px;
-}
-h5 {
-  font-size: 16px;
-}
-h6 {
-  font-size: 12px;
-}
-.table th:not([align]) {
-  text-align: left;
-}
-</style>
 
 
 
@@ -104,10 +82,6 @@ h6 {
   max-width: 940px;
   margin-left: auto;
   margin-right: auto;
-}
-code {
-  color: inherit;
-  background-color: rgba(0, 0, 0, 0.04);
 }
 img {
   max-width:100%;
@@ -124,40 +98,13 @@ button.code-folding-btn:focus {
 summary {
   display: list-item;
 }
+pre code {
+  padding: 0;
+}
 </style>
 
 
 <style type="text/css">
-/* padding for bootstrap navbar */
-body {
-  padding-top: 51px;
-  padding-bottom: 40px;
-}
-/* offset scroll position for anchor links (for fixed navbar)  */
-.section h1 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h2 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h3 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h4 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h5 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
-.section h6 {
-  padding-top: 56px;
-  margin-top: -56px;
-}
 .dropdown-submenu {
   position: relative;
 }
@@ -185,7 +132,7 @@ body {
   margin-right: -10px;
 }
 .dropdown-submenu:hover>a:after {
-  border-left-color: #ffffff;
+  border-left-color: #adb5bd;
 }
 .dropdown-submenu.pull-left {
   float: none;
@@ -197,7 +144,7 @@ body {
 }
 </style>
 
-<script>
+<script type="text/javascript">
 // manage active state of menu based on current page
 $(document).ready(function () {
   // active menu anchor
@@ -208,10 +155,23 @@ $(document).ready(function () {
   var menuAnchor = $('a[href="' + href + '"]');
 
   // mark it active
-  menuAnchor.parent().addClass('active');
+  menuAnchor.tab('show');
 
   // if it's got a parent navbar menu mark it active as well
   menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
 });
 </script>
 
@@ -223,7 +183,6 @@ $(document).ready(function () {
   max-height: 500px;
   min-height: 44px;
   overflow-y: auto;
-  background: white;
   border: 1px solid #ddd;
   border-radius: 4px;
 }
@@ -349,13 +308,13 @@ div.tocify {
 
 
 <!-- setup 3col/9col grid for toc_float and main content  -->
-<div class="row-fluid">
-<div class="col-xs-12 col-sm-4 col-md-3">
+<div class="row">
+<div class="col-sm-12 col-md-4 col-lg-3">
 <div id="TOC" class="tocify">
 </div>
 </div>
 
-<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+<div class="toc-content col-sm-12 col-md-8 col-lg-9">
 
 
 
@@ -395,7 +354,7 @@ div.tocify {
   </div><!--/.container -->
 </div><!--/.navbar -->
 
-<div class="fluid-row" id="header">
+<div id="header">
 
 
 
@@ -426,10 +385,10 @@ div.tocify {
 <div class="tab-content">
 <div id="summary" class="tab-pane fade in active">
 <p>
-<strong>Last updated:</strong> 2021-04-05
+<strong>Last updated:</strong> 2021-06-01
 </p>
 <p>
-<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 2 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
+<strong>Checks:</strong> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> 7 <span class="glyphicon glyphicon-exclamation-sign text-danger" aria-hidden="true"></span> 0
 </p>
 <p>
 <strong>Knit directory:</strong> <code>TWAS_for_protein/</code> <span class="glyphicon glyphicon-question-sign" aria-hidden="true" title="This is the local directory in which the code in this file was executed."> </span>
@@ -457,16 +416,76 @@ This reproducible <a href="http://rmarkdown.rstudio.com">R Markdown</a> analysis
 <div class="panel panel-default">
 <div class="panel-heading">
 <p class="panel-title">
-<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintree988ef140b3b8e0795dc4bfc941c7da49fbff7ebdtargetblank988ef14a"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/hwittich/TWAS_for_protein/tree/988ef140b3b8e0795dc4bfc941c7da49fbff7ebd" target="_blank">988ef14</a> </a>
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongEnvironmentstrongempty"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Environment:</strong> empty </a>
 </p>
 </div>
-<div id="strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintree988ef140b3b8e0795dc4bfc941c7da49fbff7ebdtargetblank988ef14a" class="panel-collapse collapse">
+<div id="strongEnvironmentstrongempty" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! The global environment was empty. Objects defined in the global environment can affect the analysis in your R Markdown file in unknown ways. For reproduciblity it’s best to always run the code in an empty environment.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSeedstrongcodesetseed20210127code"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Seed:</strong> <code>set.seed(20210127)</code> </a>
+</p>
+</div>
+<div id="strongSeedstrongcodesetseed20210127code" class="panel-collapse collapse">
+<div class="panel-body">
+<p>The command <code>set.seed(20210127)</code> was run prior to running the code in the R Markdown file. Setting a seed ensures that any results that rely on randomness, e.g. subsampling or permutations, are reproducible.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongSessioninformationstrongrecorded"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Session information:</strong> recorded </a>
+</p>
+</div>
+<div id="strongSessioninformationstrongrecorded" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Recording the operating system, R version, and package versions is critical for reproducibility.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongCachestrongnone"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Cache:</strong> none </a>
+</p>
+</div>
+<div id="strongCachestrongnone" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Nice! There were no cached chunks for this analysis, so you can be confident that you successfully produced the results during this run.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongFilepathsstrongrelative"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>File paths:</strong> relative </a>
+</p>
+</div>
+<div id="strongFilepathsstrongrelative" class="panel-collapse collapse">
+<div class="panel-body">
+<p>Great job! Using relative paths to the files within your workflowr project makes it easier to run your code on other machines.</p>
+</div>
+</div>
+</div>
+<div class="panel panel-default">
+<div class="panel-heading">
+<p class="panel-title">
+<a data-toggle="collapse" data-parent="#workflowr-checks" href="#strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintree23c290b196279535c3ff187b70561ef75fb7f048targetblank23c290ba"> <span class="glyphicon glyphicon-ok text-success" aria-hidden="true"></span> <strong>Repository version:</strong> <a href="https://github.com/hwittich/TWAS_for_protein/tree/23c290b196279535c3ff187b70561ef75fb7f048" target="_blank">23c290b</a> </a>
+</p>
+</div>
+<div id="strongRepositoryversionstrongahrefhttpsgithubcomhwittichTWASforproteintree23c290b196279535c3ff187b70561ef75fb7f048targetblank23c290ba" class="panel-collapse collapse">
 <div class="panel-body">
 <p>
 Great! You are using Git for version control. Tracking code development and connecting the code version to the results is critical for reproducibility.
 </p>
 <p>
-The results in this page were generated with repository version <a href="https://github.com/hwittich/TWAS_for_protein/tree/988ef140b3b8e0795dc4bfc941c7da49fbff7ebd" target="_blank">988ef14</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
+The results in this page were generated with repository version <a href="https://github.com/hwittich/TWAS_for_protein/tree/23c290b196279535c3ff187b70561ef75fb7f048" target="_blank">23c290b</a>. See the <em>Past versions</em> tab to see a history of the changes made to the R Markdown and HTML files.
 </p>
 <p>
 Note that you need to be careful to ensure that all relevant files for the analysis have been committed to Git prior to generating the results (you can use <code>wflow_publish</code> or <code>wflow_git_commit</code>). workflowr only checks the R Markdown file, but you know if there are other scripts or data files that it depends on. Below is the status of the Git repository when the results were generated:
@@ -476,7 +495,6 @@ Ignored files:
     Ignored:    .RData
     Ignored:    .Rhistory
     Ignored:    .Rproj.user/
-    Ignored:    a/
 
 Untracked files:
     Untracked:  code/henry@10.22.9.205
@@ -523,6 +541,40 @@ Message
 Rmd
 </td>
 <td>
+<a href="https://github.com/hwittich/TWAS_for_protein/blob/23c290b196279535c3ff187b70561ef75fb7f048/analysis/run_every_tissue.Rmd" target="_blank">23c290b</a>
+</td>
+<td>
+hwittich
+</td>
+<td>
+2021-06-01
+</td>
+<td>
+Doing some graphing - tile plots and heat maps
+</td>
+</tr>
+<tr>
+<td>
+html
+</td>
+<td>
+<a href="https://rawcdn.githack.com/hwittich/TWAS_for_protein/a9429e4b97cbffb47aa71c4155692583db5be3ee/docs/run_every_tissue.html" target="_blank">a9429e4</a>
+</td>
+<td>
+hwittich
+</td>
+<td>
+2021-04-05
+</td>
+<td>
+Build site.
+</td>
+</tr>
+<tr>
+<td>
+Rmd
+</td>
+<td>
 <a href="https://github.com/hwittich/TWAS_for_protein/blob/988ef140b3b8e0795dc4bfc941c7da49fbff7ebd/analysis/run_every_tissue.Rmd" target="_blank">988ef14</a>
 </td>
 <td>
@@ -545,6 +597,116 @@ Implemented subprocess instead of os.system to enable parallelization of
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
 <pre><code>nohup python3 code/protein_TWAS.py --dose TOPMed_ALL_data/dosages --exp TOPMed_ALL_data/elastic_net_models/ --prot TOPMed_ALL_data/Proteome_TOPMed_ALL_ln_adjAgeSex_mean_rank-inverse_adj10PCair_MEQTL_reformatted_ids_sorted.txt --samples TOPMed_ALL_data/samples.txt --genes TOPMed_ALL_data/gene_annotation_hg38_sanitized_BP_CHROM.txt --aptamers TOPMed_ALL_data/somascan1.3k_gencode.v32_annotation.txt --out output/4-6-2021 &amp;</code></pre>
+</div>
+<div id="now-using-the-mashr-models-from-predictdb" class="section level1">
+<h1>Now using the MASHR models from PredictDB</h1>
+<p>First, let’s test one example Predict.py command with the mashr models to ensure that they work the way the elastic net models do. If successful, then we can run them through the pipeline.</p>
+<pre><code>nohup python3 /home/wheelerlab3/MetaXcan/software/Predict.py --model_db_path TOPMed_ALL_data/mashr_models/mashr_Whole_Blood.db --model_db_snp_key varID --text_genotypes TOPMed_ALL_data/dosages/nohead_hg38chr*.maf0.01.R20.8.dosage.txt --text_sample_ids TOPMed_ALL_data/samples.txt --on_the_fly_mapping METADATA &quot;chr{}_{}_{}_{}_b38&quot; --prediction_output output/4-7-2021/testing_mashr_models/mashr_Whole_Blood_predict.txt --prediction_summary_output output/4-7-2021/testing_mashr_models/mashr_Whole_Blood_predict_summary.txt &gt; output/4-7-2021/testing_mashr_models/nohup_mashr_test.out &amp;</code></pre>
+<p>Looks good!</p>
+<pre><code>nohup python3 code/protein_TWAS.py --dose TOPMed_ALL_data/dosages --exp TOPMed_ALL_data/mashr_models/ --prot TOPMed_ALL_data/Proteome_TOPMed_ALL_ln_adjAgeSex_mean_rank-inverse_adj10PCair_MEQTL_reformatted_ids_sorted.txt --samples TOPMed_ALL_data/samples.txt --genes TOPMed_ALL_data/gene_annotation_gencode.v37_hg38_sanitized_BP_CHROM.txt --aptamers TOPMed_ALL_data/somascan1.3k_gencode.v32_annotation.txt --out output/4-7-2021 &gt; output/4-7-2021/nohup.out &amp;</code></pre>
+</div>
+<div id="plotting-results" class="section level1">
+<h1>Plotting Results</h1>
+<p>Let’s try to make a heat map comparing the PrediXcan results across all of our tissues.</p>
+<p>I will attempt to recreate this heat map from the GTeX v8 release paper: <img src="assets/tissue_heat_map_gtex.v8.jpg" alt="GTeX tissue heat map" /> (A) Tissue clustering with pairwise Spearman correlation of cis-eQTL effect sizes.</p>
+<p>First, we need to generate a matrix of the Pearson correlation coefficient between each pair of tissues. Let’s first create a dataframe with the effect sizes for every tissue.</p>
+<pre class="r"><code>&quot;%&amp;%&quot; &lt;- function(a,b) paste(a,b, sep = &quot;&quot;)
+library(dplyr)</code></pre>
+<pre><code>
+Attaching package: &#39;dplyr&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:stats&#39;:
+
+    filter, lag</code></pre>
+<pre><code>The following objects are masked from &#39;package:base&#39;:
+
+    intersect, setdiff, setequal, union</code></pre>
+<pre class="r"><code>library(data.table)</code></pre>
+<pre><code>
+Attaching package: &#39;data.table&#39;</code></pre>
+<pre><code>The following objects are masked from &#39;package:dplyr&#39;:
+
+    between, first, last</code></pre>
+<pre class="r"><code>#Make a list of the tissues
+tissues &lt;- c(&quot;Adipose_Subcutaneous&quot;,&quot;Adipose_Visceral_Omentum&quot;,&quot;Adrenal_Gland&quot;,&quot;Artery_Aorta&quot;,&quot;Artery_Coronary&quot;,&quot;Artery_Tibial&quot;)#,&quot;Brain_Amygdala&quot;,&quot;Brain_Anterior_cingulate_cortex_BA24&quot;,&quot;Brain_Caudate_basal_ganglia&quot;,&quot;Brain_Cerebellar_Hemisphere&quot;,&quot;Brain_Cerebellum&quot;,&quot;Brain_Cortex&quot;,&quot;Brain_Frontal_Cortex_BA9&quot;,&quot;Brain_Hippocampus&quot;,&quot;Brain_Hypothalamus&quot;,&quot;Brain_Nucleus_accumbens_basal_ganglia&quot;,&quot;Brain_Putamen_basal_ganglia&quot;,&quot;Brain_Spinal_cord_cervical_c-1&quot;,&quot;Brain_Substantia_nigra&quot;,&quot;Breast_Mammary_Tissue&quot;,&quot;Cells_Cultured_fibroblasts&quot;,&quot;Cells_EBV-transformed_lymphocytes&quot;,&quot;Colon_Sigmoid&quot;,&quot;Colon_Transverse&quot;,&quot;Esophagus_Gastroesophageal_Junction&quot;,&quot;Esophagus_Mucosa&quot;,&quot;Esophagus_Muscularis&quot;,&quot;Heart_Atrial_Appendage&quot;,&quot;Heart_Left_Ventricle&quot;,&quot;Kidney_Cortex&quot;,&quot;Liver&quot;,&quot;Lung&quot;,&quot;Minor_Salivary_Gland&quot;,&quot;Muscle_Skeletal&quot;,&quot;Nerve_Tibial&quot;,&quot;Ovary&quot;,&quot;Pancreas&quot;,&quot;Pituitary&quot;,&quot;Prostate&quot;,&quot;Skin_Not_Sun_Exposed_Suprapubic&quot;,&quot;Skin_Sun_Exposed_Lower_leg&quot;,&quot;Small_Intestine_Terminal_Ileum&quot;,&quot;Spleen&quot;,&quot;Stomach&quot;,&quot;Testis&quot;,&quot;Thyroid&quot;,&quot;Uterus&quot;,&quot;Vagina&quot;,&quot;Whole_Blood&quot;)
+
+#Create dataframe with all the effect sizes
+tissue &lt;- tissues[1]
+effects &lt;- fread(&quot;/home/hwittich/mount/TWAS_for_protein/output/4-7-2021/mashr_&quot;%&amp;%tissue%&amp;%&quot;/mashr_&quot;%&amp;%tissue%&amp;%&quot;_every_protein_association.txt&quot;,header=T,stringsAsFactors = F,sep=&quot;\t&quot;) %&gt;% select(protein,gene,effect) %&gt;% mutate(pair = protein %&amp;% &quot;_&quot; %&amp;% gene, .keep=&quot;unused&quot;) %&gt;% rename(!!tissue:= effect) 
+for(tissue in tissues[2:length(tissues)]){
+  new_effects &lt;- fread(&quot;/home/hwittich/mount/TWAS_for_protein/output/4-7-2021/mashr_&quot;%&amp;%tissue%&amp;%&quot;/mashr_&quot;%&amp;%tissue%&amp;%&quot;_every_protein_association.txt&quot;,header=T,stringsAsFactors = F,sep=&quot;\t&quot;) %&gt;% select(protein,gene,effect) %&gt;% mutate(pair = protein %&amp;% &quot;_&quot; %&amp;% gene, .keep=&quot;unused&quot;) %&gt;% rename(!!tissue:= effect) 
+  
+  effects &lt;- effects %&gt;% full_join(new_effects,by=c(&quot;pair&quot;=&quot;pair&quot;))
+}
+effects &lt;- effects %&gt;% relocate(pair)</code></pre>
+<p>Now let’s create a matrix of correlation coefficients for every tissue pair.</p>
+<pre class="r"><code>corr_matrix &lt;- matrix(NA,length(tissues),length(tissues))
+rownames(corr_matrix) &lt;- tissues
+colnames(corr_matrix) &lt;- tissues
+for (i in 1:length(tissues)) {
+  for(j in 1:length(tissues)) {
+    if(i==j) {
+      corr_matrix[i,j] &lt;- 1
+    } else {
+      tissue1 &lt;- tissues[i]
+      tissue2 &lt;- tissues[j]
+      tissue_pair &lt;- effects %&gt;% select(!!tissue1, !!tissue2) %&gt;% filter(!is.na(get(tissue1)), !is.na(get(tissue2)))
+      library(psych)
+      results &lt;- corr.test(x=tissue_pair[,1], y=tissue_pair[,2], method=&quot;pearson&quot;)
+      corr_coef &lt;- results$r
+      corr_matrix[i,j] &lt;- corr_coef
+    }
+  }
+}</code></pre>
+<p>Now let’s plot the heat map using the matrix of correlation coefficients!</p>
+<pre class="r"><code>library(RColorBrewer)
+color &lt;- colorRampPalette(brewer.pal(8,&quot;PiYG&quot;))(25)
+heatmap(corr_matrix, revC=TRUE, col=color, margins = c(20,20))</code></pre>
+<p><img src="figure/run_every_tissue.Rmd/unnamed-chunk-3-1.png" width="672" style="display: block; margin: auto;" /></p>
+<p>A full plot comparing all 49 tissues is shown below.</p>
+<br>
+<p>
+<button type="button" class="btn btn-default btn-workflowr btn-workflowr-sessioninfo" data-toggle="collapse" data-target="#workflowr-sessioninfo" style="display: block;">
+<span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Session information
+</button>
+</p>
+<div id="workflowr-sessioninfo" class="collapse">
+<pre class="r"><code>sessionInfo()</code></pre>
+<pre><code>R version 3.6.3 (2020-02-29)
+Platform: x86_64-pc-linux-gnu (64-bit)
+Running under: Ubuntu 20.04.2 LTS
+
+Matrix products: default
+BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0
+LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0
+
+locale:
+ [1] LC_CTYPE=en_US.UTF-8       LC_NUMERIC=C              
+ [3] LC_TIME=en_US.UTF-8        LC_COLLATE=en_US.UTF-8    
+ [5] LC_MONETARY=en_US.UTF-8    LC_MESSAGES=en_US.UTF-8   
+ [7] LC_PAPER=en_US.UTF-8       LC_NAME=C                 
+ [9] LC_ADDRESS=C               LC_TELEPHONE=C            
+[11] LC_MEASUREMENT=en_US.UTF-8 LC_IDENTIFICATION=C       
+
+attached base packages:
+[1] stats     graphics  grDevices utils     datasets  methods   base     
+
+other attached packages:
+[1] RColorBrewer_1.1-2 psych_2.1.3        data.table_1.14.0  dplyr_1.0.5       
+[5] workflowr_1.6.2   
+
+loaded via a namespace (and not attached):
+ [1] Rcpp_1.0.6        highr_0.9         pillar_1.6.0      compiler_3.6.3   
+ [5] later_1.1.0.1     git2r_0.28.0      tools_3.6.3       digest_0.6.27    
+ [9] nlme_3.1-144      lattice_0.20-40   evaluate_0.14     lifecycle_1.0.0  
+[13] tibble_3.1.0      pkgconfig_2.0.3   rlang_0.4.10      DBI_1.1.1        
+[17] parallel_3.6.3    yaml_2.2.1        xfun_0.22         stringr_1.4.0    
+[21] knitr_1.32        generics_0.1.0    fs_1.5.0          vctrs_0.3.7      
+[25] grid_3.6.3        rprojroot_2.0.2   tidyselect_1.1.0  glue_1.4.2       
+[29] R6_2.5.0          fansi_0.4.2       rmarkdown_2.7     purrr_0.3.4      
+[33] magrittr_2.0.1    whisker_0.4       promises_1.2.0.1  ellipsis_0.3.1   
+[37] htmltools_0.5.1.1 mnormt_2.0.2      assertthat_0.2.1  httpuv_1.5.5     
+[41] utf8_1.2.1        stringi_1.5.3     tmvnsim_1.0-2     crayon_1.4.1     </code></pre>
+</div>
 </div>
 
 
@@ -590,7 +752,7 @@ $(document).ready(function () {
 
 $(document).ready(function () {
   $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
+    $(this).parent().toggleClass('nav-tabs-open');
   });
 });
 </script>

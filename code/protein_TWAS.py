@@ -162,5 +162,8 @@ for filename in os.listdir(models):
         every_protein_association.close()
         
         ##Plot in R
-        os.system("Rscript code/plot_significant_pairs.R "+outfile+tissue+"/"+tissue+"_every_protein_association.txt "+tissue+" "+gene_anno+" "+protein_anno+" "+outfile+"multigene_aptamers.txt "+outfile+tissue+"/")
+        #Set up output directory
+        if not os.path.isdir(outfile+"chromosomal_coordinates_tile_plots"):
+            os.system("mkdir "+outfile+"chromosomal_coordinates_tile_plots")
+        os.system("Rscript code/plot_significant_pairs.R "+outfile+tissue+"/"+tissue+"_every_protein_association.txt "+tissue+" "+gene_anno+" "+protein_anno+" "+outfile+"multigene_aptamers.txt "+outfile+"chromosomal_coordinates_tile_plots/")
 protein_matrix.close()

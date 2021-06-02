@@ -24,7 +24,7 @@ bonferroni_threshold=alpha/(n_proteins*n_transcripts)
 sig_hits <- filter(protein_associations,pvalue<bonferroni_threshold) %>% separate(gene,sep="\\.",into=c("gene_id","gene_version"))
 
 #Now annotate the positions of the predicted transcript and the protein
-gene_annotation <- read.table(gene_anno,header=T,sep="\t") %>% separate(gene_id,sep="\\.",into=c("gene_id","gene_version")) %>% select(gene_id,chrchr,start)
+gene_annotation <- read.table(gene_anno,header=T,sep=" ") %>% select(gene_id,chrchr,start)
 sig_hits <- left_join(sig_hits, gene_annotation, by = c("gene_id"="gene_id"), copy=TRUE) %>% rename("gene_chr"="chrchr","gene_start"="start")
 
 protein_annotation <- read.table(protein_anno,header=T,sep="\t") %>% select(SomaId,ENSG_id,chr,start) %>% rename("protein_ID"="ENSG_id","protein_chr"="chr","protein_start"="start")

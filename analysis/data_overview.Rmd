@@ -27,3 +27,4 @@ two columns, they are the same: FID, family ID, and IID, individual ID
 
 # Protein Expression File
 Each row corresponds to a protein (we are only working with one at the moment) and each column corresponds to an individual. 
+

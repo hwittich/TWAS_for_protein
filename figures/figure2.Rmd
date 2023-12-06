@@ -1,0 +1,250 @@
+---
+title: "Figure2"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/home/henry/TWAS_for_protein")
+```
+
+Code for generating figure 2 in "Transcriptome-wide association study of the plasma proteome reveals cis and trans regulatory mechanisms underlying complex traits."
+
+```{r}
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(qvalue)
+library(ggplot2)
+library(viridis)
+library(lattice)
+library(grid)
+library(gridExtra)
+library(ggpubr)
+library(eulerr)
+library(ggrepel)
+library(forcats)
+"%&%" = function(a,b) paste(a,b,sep="")
+```
+
+# Fig 2a. INTERVAL FDR 0.05 tile Plot
+```{r}
+all_significant_INTERVAL_results <- fread("output/9-23-2022/INTERVAL_all_tissues_FDR0.05_pairs.txt")
+
+#Annotate for number of tissues and filter down to unique pairs
+freq <- as.data.frame(table(all_significant_INTERVAL_results$pair))
+significant_INTERVAL_results <- all_significant_INTERVAL_results %>% 
+  left_join(freq, by=c("pair"="Var1")) %>%
+  mutate(INTERVAL_num_tissues = Freq, .keep="unused") %>%
+  distinct(pair, .keep_all = TRUE)
+rm(all_significant_INTERVAL_results)
+rm(freq)
+
+#Annotate for chromosomal position
+#Annotate protein
+INTERVAL_protein_annotation <- fread("data/INTERVAL_data/INTERVAL_annotation_file.txt")
+annotated_protein_results <- significant_INTERVAL_results %>% 
+  left_join(INTERVAL_protein_annotation, by=c("protein"="SomaId")) %>%
+  mutate(protein_ENSG=ENSG_id, protein_chr=chr, protein_start=start, transcript_ENSG = gene, INTERVAL_pvalue = pvalue, INTERVAL_qvalue = qvalue, pair = protein_ENSG %&%"_"%&% transcript_ENSG) %>%
+  select(pair, protein_ENSG, protein_chr, protein_start, transcript_ENSG, INTERVAL_pvalue, INTERVAL_qvalue, INTERVAL_num_tissues)
+rm(significant_INTERVAL_results)
+
+#Annotate predicted transcript
+predicted_transcript_annotation <- fread("data/TOPMed_ALL_data/gene_annotation_gencode.v37_hg38_sanitized_BP_CHROM.txt") %>% 
+  separate(gene_id,sep="\\.",into=c("ENSG_id","gene_version"))
+#Remove version number off of transcript ENSG IDs
+annotated_protein_transcript_results <- annotated_protein_results %>% 
+  left_join(predicted_transcript_annotation, by=c("transcript_ENSG"="ENSG_id")) %>%
+  mutate(transcript_chr=chrchr, transcript_start=start) %>%
+  select(pair, protein_ENSG, protein_chr, protein_start, transcript_ENSG, transcript_chr, transcript_start, INTERVAL_pvalue, INTERVAL_qvalue, INTERVAL_num_tissues)
+rm(annotated_protein_results)
+
+#Annotate for cis_trans
+cis_trans_annotated <- annotated_protein_transcript_results %>%
+  mutate(cis_trans = ifelse(!protein_chr==transcript_chr, "trans_acting", 
+                            ifelse((protein_start < (transcript_start-1000000)) | (protein_start > (transcript_start+1000000)), "trans_acting","cis_acting"))) %>%
+  mutate(cis_same = ifelse(transcript_ENSG == protein_ENSG, "cis_same", 
+                           ifelse(cis_trans == "trans_acting", "trans_acting", "cis_different")))
+rm(annotated_protein_transcript_results)
+unique_cis_trans_annotated <- cis_trans_annotated %>% distinct(pair, .keep_all = T)
+print(table(unique_cis_trans_annotated$cis_trans))
+print(table(unique_cis_trans_annotated$cis_same))
+unique_cis_trans_annotated <- cis_trans_annotated %>% distinct(protein_ENSG, .keep_all = T)
+print(table(unique_cis_trans_annotated$cis_trans))
+print(table(unique_cis_trans_annotated$cis_same))
+
+#Annotate chromosome lengths
+chromosomes<-c("chr1","chr2","chr3","chr4","chr5","chr6","chr7","chr8","chr9","chr10","chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18","chr19","chr20","chr21","chr22","chrX","chrY")
+lengths<-c(248956422,242193529,198295559,190214555,181538259,170805979,159345973,145138636,138394717,133797422,135086622,133275309,114364328,107043718,101991189,90338345,83257441,80373285,58617616,64444167,46709983,50818468,156040895,57227415)
+#Calculate chr start positions by summing length of prior chromosomes
+starts <- rep(NA,24)
+sum=0
+for(i in 1:24){
+  starts[i] = sum
+  sum = sum + lengths[i]
+}
+chr_len<-data.frame(chromosomes,starts)
+
+all_INTERVAL_results <- cis_trans_annotated %>% 
+  left_join(chr_len, by=c("transcript_chr"="chromosomes")) %>%
+  rename(transcript_chr_start = starts) %>% 
+  mutate(relative_transcript_start = transcript_chr_start + transcript_start) %>% 
+  left_join(chr_len, by=c("protein_chr"="chromosomes")) %>%
+  rename(protein_chr_start = starts) %>% 
+  mutate(relative_protein_start = protein_chr_start + protein_start) %>%
+  select(pair, protein_ENSG, protein_chr, protein_start, protein_chr_start, relative_protein_start, transcript_ENSG, transcript_chr, transcript_start, transcript_chr_start, relative_transcript_start, INTERVAL_pvalue, INTERVAL_qvalue, cis_trans, cis_same, INTERVAL_num_tissues)
+rm(cis_trans_annotated)
+
+#Plot
+fig2a <- ggplot(all_INTERVAL_results,aes(x=relative_transcript_start,y=relative_protein_start,color=cis_same,size=INTERVAL_num_tissues)) +
+  geom_point(shape=1, show.legend = FALSE) +
+  #scale_color_viridis_d(direction=-1) +
+  scale_color_manual(values = c("#fde725", "#5ec962", "#440154")) +
+  scale_size_continuous(guide="legend", limits=c(0, 49), breaks=seq(4,49,by=15), range = c(1,4)) + 
+  geom_hline(yintercept=starts[1:23],linewidth=0.2) +
+  geom_vline(xintercept=starts[1:22],linewidth=0.2) +
+  coord_cartesian(xlim=c(starts[1],starts[22]),ylim=c(starts[1],starts[22])) +
+  theme_classic(10) + 
+  theme(axis.text = element_text(size = 8), 
+        axis.title = element_text(size = 11)) +
+  labs(x="Predicted Transcript Chromosomal Position",y="Target Protein Chromosomal Position", title="INTERVAL Discovery") +
+  scale_x_continuous(breaks=starts[1:22],labels=c(1:10,"",12,"",14,"",16,"",18,"","","",22)) +
+  scale_y_continuous(breaks=starts[1:23],labels=c(1:16,"",18,"",20,"",22,"X"))
+fig2a
+```
+
+# Fig 2b. INTERVAL FDR 0.05 Tested in TOPMed tile Plot
+```{r}
+TOPMed_proteins <- fread("data/TOPMed_ALL_data/Proteome_TOPMed_ALL_ln_adjAgeSex_mean_rank-inverse_adj10PCair_MEQTL_reformatted_ids_sorted.txt", header=T) %>% 
+  select(joint_id) %>% 
+  separate(joint_id, sep="_", into = c("TOPMed_ID","ENSG_ID")) %>%
+  separate(ENSG_ID, sep="\\.", into= c("ENSG_ID","gene_version")) %>%
+  select(ENSG_ID)
+
+#Inner join with results dataframe to keep only significant pairs tested in TOPMed as well
+all_results_tested_in_TOPMed <- all_INTERVAL_results %>% inner_join(TOPMed_proteins, by=c("protein_ENSG"="ENSG_ID"))
+
+print(table(all_results_tested_in_TOPMed$cis_trans))
+print(table(all_results_tested_in_TOPMed$cis_same))
+unique_cis_trans_annotated <- all_results_tested_in_TOPMed %>% distinct(protein_ENSG, .keep_all = T)
+print(table(unique_cis_trans_annotated$cis_trans))
+print(table(unique_cis_trans_annotated$cis_same))
+
+#Plot
+fig2b <- ggplot(all_results_tested_in_TOPMed,aes(x=relative_transcript_start,y=relative_protein_start,color=cis_same,size=INTERVAL_num_tissues)) +
+  geom_point(shape=1, show.legend = FALSE) +
+  #scale_color_viridis_d(direction=-1) +
+  scale_color_manual(values = c("#fde725", "#5ec962", "#440154")) +
+  scale_size_continuous(guide="legend", limits=c(0, 49), breaks=seq(4,49,by=15), range = c(1,4)) + 
+  geom_hline(yintercept=starts[1:23],linewidth=0.2) +
+  geom_vline(xintercept=starts[1:22],linewidth=0.2) +
+  coord_cartesian(xlim=c(starts[1],starts[22]),ylim=c(starts[1],starts[22])) +
+  theme_classic(10) + 
+  theme(axis.text = element_text(size = 8), 
+        axis.title = element_text(size = 11)) +
+  labs(x="Predicted Transcript Chromosomal Position",y="Target Protein Chromosomal Position", title="Tested in TOPMed MESA") +
+  scale_x_continuous(breaks=starts[1:22],labels=c(1:10,"",12,"",14,"",16,"",18,"","","",22)) +
+  scale_y_continuous(breaks=starts[1:23],labels=c(1:16,"",18,"",20,"",22,"X"))
+fig2b
+```
+
+# Fig 2c. INTERVAL FDR 0.05 TOPMed 0.05 tile Plot
+```{r}
+all_significant_TOPMed_results <- fread("output/9-16-2022/all_INTERVAL_FDR0.05_within_tissue_TOPMed_replicated_FDR0.05_within_tissue_pairs.txt")
+
+#Annotate for number of tissues and filter down to unique pairs
+freq <- as.data.frame(table(all_significant_TOPMed_results$pair))
+significant_TOPMed_results <- all_significant_TOPMed_results %>% 
+  left_join(freq, by=c("pair"="Var1")) %>%
+  mutate(TOPMed_num_tissues = Freq, .keep="unused") %>%
+  distinct(pair, .keep_all = TRUE)
+rm(all_significant_TOPMed_results)
+
+#Annotate for cis_trans
+cis_trans_annotated <- significant_TOPMed_results %>%
+  mutate(cis_trans = ifelse(!protein_chr==transcript_chr, "trans_acting", 
+                            ifelse((protein_start < (transcript_start-1000000)) | (protein_start > (transcript_start+1000000)), "trans_acting","cis_acting"))) %>%
+  mutate(cis_same = ifelse(transcript_ENSG == protein_ENSG, "cis_same", 
+                           ifelse(cis_trans == "trans_acting", "trans_acting", "cis_different")))
+rm(significant_TOPMed_results)
+unique_cis_trans_annotated <- cis_trans_annotated %>% distinct(pair, .keep_all = T)
+print(table(unique_cis_trans_annotated$cis_trans))
+print(table(unique_cis_trans_annotated$cis_same))
+unique_cis_trans_annotated <- cis_trans_annotated %>% distinct(protein_ENSG, .keep_all = T)
+print(table(unique_cis_trans_annotated$cis_trans))
+print(table(unique_cis_trans_annotated$cis_same))
+
+#Annotate chromosome lengths
+chromosomes<-c("chr1","chr2","chr3","chr4","chr5","chr6","chr7","chr8","chr9","chr10","chr11","chr12","chr13","chr14","chr15","chr16","chr17","chr18","chr19","chr20","chr21","chr22","chrX","chrY")
+lengths<-c(248956422,242193529,198295559,190214555,181538259,170805979,159345973,145138636,138394717,133797422,135086622,133275309,114364328,107043718,101991189,90338345,83257441,80373285,58617616,64444167,46709983,50818468,156040895,57227415)
+#Calculate chr start positions by summing length of prior chromosomes
+starts <- rep(NA,24)
+sum=0
+for(i in 1:24){
+  starts[i] = sum
+  sum = sum + lengths[i]
+}
+chr_len<-data.frame(chromosomes,starts)
+
+all_TOPMed_results <- cis_trans_annotated %>% 
+  left_join(chr_len, by=c("transcript_chr"="chromosomes")) %>%
+  rename(transcript_chr_start = starts) %>% 
+  mutate(relative_transcript_start = transcript_chr_start + transcript_start) %>% 
+  left_join(chr_len, by=c("protein_chr"="chromosomes")) %>%
+  rename(protein_chr_start = starts) %>% 
+  mutate(relative_protein_start = protein_chr_start + protein_start) %>%
+  select(pair, protein_ENSG, protein_chr, protein_start, protein_chr_start, relative_protein_start, transcript_ENSG, transcript_chr, transcript_start, transcript_chr_start, relative_transcript_start, INTERVAL_pvalue, INTERVAL_qvalue, TOPMed_pvalue, TOPMed_qvalue, cis_trans, cis_same, TOPMed_num_tissues)
+rm(cis_trans_annotated)
+
+#Plot
+fig2c <- ggplot(all_TOPMed_results,aes(x=relative_transcript_start,y=relative_protein_start,color=cis_same,size=TOPMed_num_tissues)) +
+  geom_point(shape=1, show.legend = FALSE) +
+  #scale_color_viridis_d(direction=-1) +
+  scale_color_manual(values = c("#fde725", "#5ec962", "#440154")) +
+  scale_size_continuous(guide="legend", limits=c(0, 49), breaks=seq(4,49,by=15), range = c(1,4)) + 
+  geom_hline(yintercept=starts[1:23],linewidth=0.2) +
+  geom_vline(xintercept=starts[1:22],linewidth=0.2) +
+  coord_cartesian(xlim=c(starts[1],starts[22]),ylim=c(starts[1],starts[22])) +
+  theme_classic(10) + 
+  theme(axis.text = element_text(size = 8), 
+        axis.title = element_text(size = 11)) +
+  labs(x="Predicted Transcript Chromosomal Position",y="Target Protein Chromosomal Position", title="TOPMed MESA Replication") +
+  scale_x_continuous(breaks=starts[1:22],labels=c(1:10,"",12,"",14,"",16,"",18,"","","",22)) +
+  scale_y_continuous(breaks=starts[1:23],labels=c(1:16,"",18,"",20,"",22,"X"))
+fig2c
+```
+
+# Fig. 2d Bar plots of significant results
+```{r}
+all_INTERVAL_results <- all_INTERVAL_results %>% filter(!is.na(cis_trans)) %>% 
+  mutate(cis_same_trans = ifelse(cis_trans == "trans_acting", "trans_acting", cis_same))
+all_results_tested_in_TOPMed <- all_results_tested_in_TOPMed %>% filter(!is.na(cis_trans)) %>% 
+  mutate(cis_same_trans = ifelse(cis_trans == "trans_acting", "trans_acting", cis_same))
+all_TOPMed_results <- all_TOPMed_results %>% filter(!is.na(cis_trans)) %>% 
+  mutate(cis_same_trans = ifelse(cis_trans == "trans_acting", "trans_acting", cis_same))
+
+INTERVAL_counts <- as.data.frame(table(all_INTERVAL_results$cis_same_trans))
+colnames(INTERVAL_counts) <- c("cis_same_trans","num_sig_pairs")
+INTERVAL_counts$cohort <- rep("INTERVAL Discovery",3)
+
+INTERVAL_tested_TOPMed_counts <- as.data.frame(table(all_results_tested_in_TOPMed$cis_same_trans))
+colnames(INTERVAL_tested_TOPMed_counts) <- c("cis_same_trans","num_sig_pairs")
+INTERVAL_tested_TOPMed_counts$cohort <- rep("Tested in TOPMed MESA",3)
+
+TOPMed_counts <- as.data.frame(table(all_TOPMed_results$cis_same_trans))
+colnames(TOPMed_counts) <- c("cis_same_trans","num_sig_pairs")
+TOPMed_counts$cohort <- rep("TOPMed MESA Replication",3)
+
+sig_pair_counts <- rbind(INTERVAL_counts, INTERVAL_tested_TOPMed_counts, TOPMed_counts)
+
+fig2d <- ggplot(sig_pair_counts, aes(x=factor(cohort, level = c("INTERVAL Discovery","Tested in TOPMed MESA","TOPMed MESA Replication")), y=num_sig_pairs, fill=cis_same_trans)) +
+  geom_bar(stat="identity", position=position_dodge()) + 
+  #scale_fill_manual(values = c("#fde725", "#21918c", "#440154")) +
+  scale_fill_manual(values = c("#fde725", "#5ec962", "#440154"), name = "Mechanism", labels = c("Cis-different","Cis-same","Trans-Acting")) +
+    theme_classic(10) + 
+    theme(axis.text = element_text(size = 10), 
+          axis.text.x = element_text(angle = 90, hjust=1),
+          axis.title = element_text(size = 11)) +
+    labs(x=element_blank(),y="Number of Significant Pairs")
+fig2d
+```

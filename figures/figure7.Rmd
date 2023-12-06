@@ -1,0 +1,81 @@
+---
+title: "figure7"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/home/henry/TWAS_for_protein")
+```
+
+Code for generating figure 7 in "Transcriptome-wide association study of the plasma proteome reveals cis and trans regulatory mechanisms underlying complex traits."
+
+```{r}
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(qvalue)
+library(ggplot2)
+library(viridis)
+library(lattice)
+library(grid)
+library(gridExtra)
+library(ggpubr)
+library(eulerr)
+library(ggrepel)
+library(forcats)
+"%&%" = function(a,b) paste(a,b,sep="")
+```
+
+# Figure 7. Boxplot of cis_same correlation values across tissues
+```{r}
+corr_matrix <- fread("/home/henry/TWAS_for_protein/output/4-24-2023/significant_cis_same_genes_expression_protein_levels_correlation_matrix.txt")
+#first column is gene and last three are observed tissues
+tissues <- colnames(corr_matrix)[2:50]
+
+tissue <- tissues[1]
+corr_vals <- corr_matrix %>% select(all_of(tissue)) %>% drop_na()
+colnames(corr_vals) <- "corr"
+tissue_name <- c(rep(tissue, length(corr_vals$corr)))
+corr_list <- cbind(corr_vals, tissue_name)
+for(tissue in tissues[2:length(tissues)]) {
+  corr_vals <- corr_matrix %>% select(all_of(tissue)) %>% drop_na()
+  colnames(corr_vals) <- "corr"
+  tissue_name <- c(rep(tissue, length(corr_vals$corr)))
+  tissue_corrs <- cbind(corr_vals, tissue_name)
+  
+  corr_list <- rbind(corr_list, tissue_corrs)
+}
+
+gtex.colors <- read.table("https://github.com/stephenslab/gtexresults/blob/master/data/GTExColors.txt?raw=TRUE", sep = '\t', comment.char = '', stringsAsFactors = F) 
+gtex.colors <- gtex.colors %>% filter(V1 != "Bladder", V1 != "Cervix - Ectocervix", V1 != "Cervix - Endocervix", V1 != "Fallopian Tube")
+
+#They are in alphabetical order, can cbind with list of tissues and then left join with corr_list
+gtex.colors$tissue <- tissues
+#Need to manually switch lymphocytes and fibroblasts
+lymphocyte_color <- gtex.colors[21,2]
+gtex.colors[21,2] <- gtex.colors[22,2]
+gtex.colors[22,2] <- lymphocyte_color
+
+gtex.colors <- gtex.colors %>% mutate(color_code = V2) %>% select(tissue, color_code)
+myColors <- gtex.colors$color_code
+names(myColors) <- gtex.colors$tissue
+
+corr_list <- corr_list %>% left_join(gtex.colors, by=c("tissue_name"="tissue"))
+
+
+
+fig7 <- ggplot(corr_list, aes(x=fct_reorder(tissue_name, corr, .fun = median, .desc =TRUE), y=corr, fill = tissue_name)) +
+  geom_boxplot(notch = T, show.legend = F,size=0.3,outlier.size = 0.1) +
+  scale_fill_manual(name = "gtex.colors", values = myColors) + 
+#  coord_cartesian(ylim=c(-0.15,0.3)) +
+#  geom_hline(yintercept = max((corr_list |> group_by(tissue_name) |> summarize(median(corr)))[,2]),color='blue',linewidth=0.3)+ #max median line
+  geom_hline(yintercept = median(corr_list$corr),color='blue',linewidth=0.3) + #overall median line
+  theme_classic(10) +
+  theme(axis.text = element_text(size = 10), 
+        axis.text.x = element_text(angle = 90, hjust=1, vjust=0.4),
+        axis.title = element_text(size = 11),
+        legend.title = element_text(size=10)) +
+  labs(x="GTEx Tissue",y="Correlation of Expression\n with Protein Levels")
+fig7
+```

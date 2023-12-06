@@ -1,0 +1,48 @@
+---
+title: "figure5"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/home/henry/TWAS_for_protein")
+```
+
+Code for generating figure 5 in "Transcriptome-wide association study of the plasma proteome reveals cis and trans regulatory mechanisms underlying complex traits."
+
+```{r}
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(qvalue)
+library(ggplot2)
+library(viridis)
+library(lattice)
+library(grid)
+library(gridExtra)
+library(ggpubr)
+library(eulerr)
+library(ggrepel)
+library(forcats)
+"%&%" = function(a,b) paste(a,b,sep="")
+```
+
+# Figure 5 TF Enrichment of Trans Targets
+```{r}
+trans_target_TF_enrichment <- data.frame(TFs = c("NFKB2","GATA1","RELA","NFAT1C","FOXF2","AR","STAT1"), background_in_set = c(61, 51, 52, 351, 44, 17, 55), interest_in_set = c(16, 13, 14, 59, 12, 7, 14), pval = c(1.93e-2, 3.58e-2, 2.95e-2, 5.43e-4, 3.40e-2, 3.40e-2, 3.21e-2))
+trans_target_TF_enrichment <- trans_target_TF_enrichment %>% mutate(gene_ratio = interest_in_set / background_in_set)
+
+fig5 <- ggplot(trans_target_TF_enrichment, aes(x=gene_ratio, y=reorder(TFs, gene_ratio), size=background_in_set, color=pval)) +
+  scale_color_viridis(name = "Adjusted P-Value") +
+  scale_size_continuous(guide="legend", name = "Gene Set Size", range = c(3,10)) + 
+  geom_point() +
+  xlim(0,0.5) +
+  theme_classic(10) +
+  theme(axis.text = element_text(size = 10), 
+        axis.text.x = element_text(),
+        axis.title = element_text(size = 11),
+        legend.title = element_text(size=10)) +
+  labs(x=expression(paste("Proportion of ",italic("Trans"),"-Targets in Gene Set")), y = "Transcription Factors")
+fig5
+```
+

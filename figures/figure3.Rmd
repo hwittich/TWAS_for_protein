@@ -1,0 +1,41 @@
+---
+title: "Figure3"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/home/henry/TWAS_for_protein")
+```
+
+Code for generating figure 3 in "Transcriptome-wide association study of the plasma proteome reveals cis and trans regulatory mechanisms underlying complex traits."
+
+```{r}
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(qvalue)
+library(ggplot2)
+library(viridis)
+library(lattice)
+library(grid)
+library(gridExtra)
+library(ggpubr)
+library(eulerr)
+library(ggrepel)
+library(forcats)
+"%&%" = function(a,b) paste(a,b,sep="")
+```
+
+# Figure 3 Violin Plot of Tissue Replication Counts
+```{r}
+fig3 <- ggplot(subset(all_INTERVAL_results, !is.na(cis_trans)), aes(x=cis_trans,y=INTERVAL_num_tissues)) +
+  geom_violin(aes(fill=cis_trans), show.legend=F) +
+  scale_fill_manual(values = c("#21918c", "#440154")) +
+  geom_boxplot(width=0.05) + 
+    theme_classic(10) + 
+    theme(axis.text = element_text(size = 15), 
+          axis.title = element_text(size = 15)) +
+    labs(x=element_blank(),y="Number of Tissues Discovered In")
+fig3
+```

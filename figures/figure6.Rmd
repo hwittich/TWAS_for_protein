@@ -1,0 +1,151 @@
+---
+title: "figure6"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/home/henry/TWAS_for_protein")
+```
+
+Code for generating figure 6 in "Transcriptome-wide association study of the plasma proteome reveals cis and trans regulatory mechanisms underlying complex traits."
+
+```{r}
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(qvalue)
+library(ggplot2)
+library(viridis)
+library(lattice)
+library(grid)
+library(gridExtra)
+library(ggpubr)
+library(eulerr)
+library(ggrepel)
+library(forcats)
+"%&%" = function(a,b) paste(a,b,sep="")
+```
+
+# Figure 6a Number of Significant Associations Observed vs Predicted Expression
+```{r}
+all_sig_cis_same_results <- fread("output/3-9-2023/all_signficant_FDR0.05_cis_same_results_TOPMed.txt")
+
+all_unique_sig_predicted_results <- all_sig_cis_same_results %>% 
+  filter(expression_type == "predicted") %>% 
+  distinct(transcript_ENSG, .keep_all = T)
+unique_predicted_genes <- all_unique_sig_predicted_results$transcript_ENSG
+
+all_unique_sig_observed_results <- all_sig_cis_same_results %>% 
+  filter(expression_type == "observed") %>% 
+  distinct(transcript_ENSG, .keep_all = T)
+unique_observed_genes <- all_unique_sig_observed_results$transcript_ENSG
+
+intersecting_genes <- intersect(unique_predicted_genes, unique_observed_genes)
+
+#sig_associations_counts <- data.frame(expression_type = c("observed","predicted", "observed", "predicted"), num_associations = c(length(unique_observed_genes) - length(intersecting_genes), length(unique_predicted_genes) - length(intersecting_genes), length(intersecting_genes), length(intersecting_genes)), unique = c("unique","unique","shared","shared"))
+  
+sig_associations_counts <- data.frame(expression_type = c("Observed","Predicted"), num_associations = c(length(unique_observed_genes) - length(intersecting_genes), length(unique_predicted_genes) - length(intersecting_genes)))
+
+venndiag <- euler(c(Obs = length(unique_observed_genes) - length(intersecting_genes),
+                    Pred = length(unique_predicted_genes) - length(intersecting_genes),
+                    "Pred&Obs" = length(intersecting_genes)))
+
+fig6a <- ggplot(sig_associations_counts, aes(x=expression_type, y=num_associations, fill=expression_type)) +
+  geom_bar(stat="identity") +
+  scale_fill_manual(values = c("#de4968","#414487"), name="Expression Type", labels = c("Observed","Predicted")) +
+    theme_classic(10) + 
+    theme(axis.text = element_text(size = 10), 
+          axis.text.x = element_text(),
+          axis.title = element_text(size = 11)) +
+    labs(x=element_blank(),y="Unique Associations")
+fig6a
+```
+
+# Figure 6b Pi1s Observed vs Predicted Expression
+```{r}
+predicted_pi1s <- fread("output/3-9-2023/TOPMed_pred_expr_all_cis_same_pi1s_lambda0.75.txt")
+observed_pi1s <- fread("output/3-9-2023/TOPMed_obs_expr_all_cis_same_pi1s_lambda0.75.txt")
+
+cis_trans <- c(rep("trans_acting",49),rep("cis_acting",49),rep("cis_same",49),rep("cis_different",49))
+groups <- as.data.frame(cis_trans)
+pred_obs <- c(rep("predicted",49*4))
+expression <- as.data.frame(pred_obs)
+tissue <- c(rep(predicted_pi1s$tissue, 4))
+tissues <- as.data.frame(tissue)
+pi1s <- c(predicted_pi1s$trans_acting, predicted_pi1s$cis_acting, predicted_pi1s$cis_same, predicted_pi1s$cis_different)
+values <- as.data.frame(pi1s)
+pred_pi1s_for_plotting <- cbind(expression,tissues,groups,values)
+pred_pi1s_for_plotting <- pred_pi1s_for_plotting %>% filter(cis_trans == "cis_same")
+
+cis_trans <- c(rep("trans_acting",3),rep("cis_acting",3),rep("cis_same",3),rep("cis_different",3))
+groups <- as.data.frame(cis_trans)
+pred_obs <- c(rep("observed",3*4))
+expression <- as.data.frame(pred_obs)
+tissue <- c(rep(observed_pi1s$tissue, 4))
+tissues <- as.data.frame(tissue)
+pi1s <- c(observed_pi1s$trans_acting, observed_pi1s$cis_acting, observed_pi1s$cis_same, observed_pi1s$cis_different)
+values <- as.data.frame(pi1s)
+obs_pi1s_for_plotting <- cbind(expression,tissues,groups,values)
+obs_pi1s_for_plotting <- obs_pi1s_for_plotting %>% filter(cis_trans == "cis_same")
+
+cis_same_pi1s_for_plotting <- rbind(pred_pi1s_for_plotting, obs_pi1s_for_plotting)
+
+fig6b <- ggplot(pred_pi1s_for_plotting, aes(x=pi1s)) + 
+  geom_density(alpha = 0.5, fill = "#414487") +
+  scale_x_continuous(limits = c(0, 0.6)) +
+  geom_vline(xintercept=max(obs_pi1s_for_plotting$pi1s),size=1, color="#de4968") +
+  annotate("text", x=(max(obs_pi1s_for_plotting$pi1s)-0.13), y=4, label="PBMC: "%&%round(max(obs_pi1s_for_plotting$pi1s),3), size=4, color="#de4968") +
+  #scale_x_continuous(limits = c(0, 1.0)) +
+  theme_classic(10) + 
+  theme(axis.text = element_text(size = 10), 
+        axis.text.x = element_text(angle = 45, hjust=1),
+        axis.title = element_text(size = 11),
+        legend.title = element_text(size=10),
+        legend.text = element_text(size=9)) +
+  labs(x=expression(paste("Distribution of Cis-same ",pi[1],"'s across Tissues")),y=element_blank())
+fig6b
+```
+
+# Figure 6c Comparing Correlation of Expression with Protein Abundance
+```{r}
+max_corr_vals <- fread("output/4-24-2023/significant_cis_same_genes_expression_protein_levels_max_correlations_matrix.txt") 
+filtered_max_corr_vals <- max_corr_vals %>% filter(observed_expression != -Inf) %>%
+  filter(predicted_expression != -Inf)
+
+fig6c <- ggplot(filtered_max_corr_vals, aes(x=observed_expression, y=predicted_expression)) +
+  geom_point() +
+  geom_abline(color = "#de4968") +
+  theme_classic(10) +
+  labs(x="Correlation of Observed Expression\n with Protein Levels",
+       y="Correlation of Predicted Expression\n with Protein Levels") +
+  theme(axis.text = element_text(size = 10), 
+        axis.title = element_text(size = 11))
+fig6c
+```
+
+# Figure 6d Comparing Correlation of Expression with Protein Abundance
+```{r}
+#Violin plot?
+#Need to reshape so that we have 1 column: predicted or observed expression
+#second column is vector of correlation values
+obs_correlations <- as.data.frame(filtered_max_corr_vals$observed_expression) %>% mutate(obs_pred = "Observed")
+colnames(obs_correlations) <- c("corr","obs_pred")
+
+pred_correlations <- as.data.frame(filtered_max_corr_vals$predicted_expression) %>% mutate(obs_pred = "Predicted")
+colnames(pred_correlations) <- c("corr","obs_pred")
+
+corr_vals_for_plotting <- rbind(obs_correlations, pred_correlations)
+fig6d <- ggplot(corr_vals_for_plotting, aes(x=obs_pred, y=corr)) +
+  geom_violin(position = position_dodge(width = 0.4), width=1, aes(fill=obs_pred), show.legend=F) +
+  scale_fill_manual(values = c("#de4968","#414487")) +
+  geom_boxplot(width=0.1, position = position_dodge(width = 0.4)) + 
+  theme_classic(10) +
+  theme(axis.text = element_text(size = 10), 
+          axis.text.x = element_text(),
+          axis.title = element_text(size = 11)) +
+  labs(x=element_blank(),y="Correlation of Expression with Protein Levels")
+fig6d
+```
+
+

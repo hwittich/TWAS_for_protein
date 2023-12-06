@@ -1,0 +1,51 @@
+---
+title: "figure4"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = "/home/henry/TWAS_for_protein")
+```
+
+Code for generating figure 4 in "Transcriptome-wide association study of the plasma proteome reveals cis and trans regulatory mechanisms underlying complex traits."
+
+```{r}
+library(data.table)
+library(dplyr)
+library(tidyr)
+library(qvalue)
+library(ggplot2)
+library(viridis)
+library(lattice)
+library(grid)
+library(gridExtra)
+library(ggpubr)
+library(eulerr)
+library(ggrepel)
+library(forcats)
+"%&%" = function(a,b) paste(a,b,sep="")
+```
+
+# Figure 4 $\pi_1$ INT vs $\pi_1$ MESA 
+```{r}
+data = fread("/home/wheelerlab3/wittich_et_al_figs/tissue_pi1_count_corr_table.tsv")
+
+#put all on same plot, colored by cis-same, cis-diff, trans
+combo_INT = select(data, Tissue,pi1_trans_INT, `pi1_cis-diff_INT`, `pi1_cis-same_INT`) |>
+  pivot_longer(!Tissue,names_to="dataset",values_to="pi1_INT") |>
+  separate(dataset, c("first", "Mechanism", "last"), sep = "_") |> #removes pi1_ and _INT
+  select(-first,-last)
+combo_MESA = select(data, Tissue,pi1_trans_MESA, `pi1_cis-diff_MESA`, `pi1_cis-same_MESA`) |>
+  pivot_longer(!Tissue,names_to="dataset",values_to="pi1_MESA") |>
+  separate(dataset, c("first", "Mechanism", "last"), sep = "_") |> #removes pi1_ and _MESA
+  select(-first,-last)
+combo = left_join(combo_INT, combo_MESA, by=c("Tissue", "Mechanism"))
+fig4 = ggplot(combo, aes(x=pi1_MESA,y=pi1_INT,color=Mechanism)) + geom_point() + 
+  geom_text_repel(data= subset(combo, Tissue=="Whole Blood"|Tissue=="Muscle - Skeletal"|Tissue=="Kidney - Cortex"),aes(label=factor(Tissue,labels=c("Kidney","Muscle","Blood"))),size = 4, color="gray40",segment.size= 0.3,min.segment.length = unit(0, 'lines'),box.padding = 0.5) + 
+  geom_abline(slope=1,intercept = 0)+ 
+  scale_color_manual(values = c("#fde725", "#5ec962", "#440154"), name = "Mechanism", labels = c("Cis-different","Cis-same","Trans-Acting")) +
+  coord_cartesian(xlim=c(0,1),ylim=c(-0.02,0.4)) + theme_bw(16) +
+  labs(x=expression(paste(pi[1]," TOPMed MESA")),y=expression(paste(pi[1]," INTERVAL")))
+fig4
+```
